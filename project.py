@@ -16,6 +16,7 @@ def read_tiles_file(file_name):
 
 def main():
     board = Board(read_tiles_file("tiles.txt"))
+    # add docks
 	
 
 if __name__ == "__main__": main()
