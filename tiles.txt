@@ -1,0 +1,8 @@
+# id, tile_type, robber, dice_value
+1, forest, none, 6 
+2, pasture, none, 8
+3, field, none, 4
+4, mountain, none, 12
+
+
+

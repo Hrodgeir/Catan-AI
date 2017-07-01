@@ -4,7 +4,8 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
-
+.idea/
+__pycache__/
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
