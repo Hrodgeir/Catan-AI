@@ -1,4 +1,4 @@
-#vertex id, neighbour1, neighbour2,...., neighbourn
+#vertex id,neighbour1,neighbour2,...,neighbourN
 1,2,9
 2,1,3
 3,2,4,11

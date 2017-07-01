@@ -16,5 +16,3 @@ class Tile():
 	def get_dice_value(self):
 		""" Gets the dice value of the placement """
 		return self.get_dice_value
-
-	

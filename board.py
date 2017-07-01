@@ -8,12 +8,6 @@ class Board():
         self.placements = []
         self.vertex_graph = Graph()
         self.tile_vertex_map = {}
-
-        #for i in range(54):
-            #self.placements.append(placement.Placement(None, None, None))
-
-        """ How to generate board? """
-        #i would say just read from an input file.
         self.populate_tile_vertex_map()
         self.read_vertices_file("vertices.txt")
 	
@@ -40,14 +34,14 @@ class Board():
         #print(str(self.vertex_graph.adjacencyList()))
 
     # check to see if the position is available (enemies at least 2 edges away in board)
-    def valid_vertex_for_position(vertex_id):
+    def valid_vertex_for_position(self, vertex_id):
         for x in self.vertex_graph.vertices[vertex_id]:
             print(x.name)
             if (x.owner != None):
                 return False
         return True
     
-    # populates structure that shows which vertices are adjecent to which tiles
+    # populates structure that shows which vertices are adjacent to which tiles
     def populate_tile_vertex_map(self):
         self.tile_vertex_map[1] = [1]
         self.tile_vertex_map[2] = [1]
