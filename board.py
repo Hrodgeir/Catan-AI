@@ -13,7 +13,7 @@ class Board():
         self.docks = [] 
         self.read_docks_file("docks.txt")
         self.read_vertices_file("vertices.txt")
-        
+
     def read_vertices_file(self, file_name):
         vertices = []
         i = 0
@@ -48,22 +48,41 @@ class Board():
 
     def read_docks_file(self, file_name):
         """ Read in the dock order by resource"""
-        with open(file_name) as f:
-            lines = f.readlines()
-            for resource in lines: 
-                resource = resource.strip()
-                if (len(resource) > 0 and resource[0] != "#"):
-                    new_dock = Dock(resource)
-                    self.docks.append(new_dock)
+        try:
+            with open(file_name) as f:
+                lines = f.readlines()
+                assert(len(lines) == 10)
+                for resource in lines: 
+                    resource = resource.strip()
+                    if (len(resource) > 0 and resource[0] != "#"):
+                        if(self.validate_dock(resource)):
+                            new_dock = Dock(resource)
+                            self.docks.append(new_dock)
+                        else:
+                            raise ValueError
+
+        except ValueError:
+            print("Bad value in docks.txt file...")
+            raise
+
+        except AssertionError:
+            print("docks.txt must have 10 lines only.")
+            raise
+
+    def validate_dock(self, resource):
+        if(resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
+            return False
+        else:
+            return True
 
     def populate_docks(self, vertices):
-        
+
         vertices[2].set_dock(self.docks[0])
         vertices[3].set_dock(self.docks[0])
 
         vertices[5].set_dock(self.docks[1])
         vertices[6].set_dock(self.docks[1])
-        
+
         vertices[8].set_dock(self.docks[2])
         vertices[9].set_dock(self.docks[2])
 
