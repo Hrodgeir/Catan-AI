@@ -1,10 +1,10 @@
-#vertex id1,vertex id2, resource
-3,4,stone
-6,7,all
-8,9,wheat
-16,26,sheep
-17,28,all
-37,47,all
-39,40,wood
-50,51,brick
-53,54,all
+#resource
+stone
+all
+wheat
+sheep
+all
+all
+wood
+brick
+all
