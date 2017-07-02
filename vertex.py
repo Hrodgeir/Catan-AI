@@ -1,3 +1,5 @@
+from dock import *
+
 class Vertex:
     def __init__(self, vertex, tile_id):
         self.name = vertex
@@ -26,6 +28,13 @@ class Vertex:
                     neighbor.neighbors = sorted(neighbor.neighbors)
             else:
                 return False
+
+    def set_dock(self, dock):
+        if isinstance(dock, Dock):
+            self.dock = dock
         
+        else:
+            return False            
+
     #def __repr__(self):
         #return str(self.neighbors)

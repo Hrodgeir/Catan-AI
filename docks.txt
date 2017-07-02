@@ -1,0 +1,10 @@
+#resource
+stone
+all
+wheat
+sheep
+all
+all
+wood
+brick
+all

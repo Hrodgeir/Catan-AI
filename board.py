@@ -2,15 +2,18 @@
 import placement
 from graph import *
 from vertex import *
+from dock import *
 
 class Board():
     def __init__(self, tiles):
-        self.placements = []
+        #self.placements = []
         self.vertex_graph = Graph()
         self.tile_vertex_map = {}
         self.populate_tile_vertex_map()
+        self.docks = [] 
+        self.read_docks_file("docks.txt")
         self.read_vertices_file("vertices.txt")
-	
+
     def read_vertices_file(self, file_name):
         vertices = []
         i = 0
@@ -19,15 +22,17 @@ class Board():
         while (i < 54):
             vertices.append(Vertex(i + 1, self.tile_vertex_map[i + 1])) #vertex name, sorrounding tile ids
             i = i + 1
+            
+        self.populate_docks(vertices)
 
         # open vertices file to get the edges
         with open(file_name) as f:
             lines = f.readlines()
             l = []
-            for x in lines:
-                x = x.strip()
-                if (len(x) > 0 and x[0] != "#"):
-                    l = x.split(",")
+            for line in lines:
+                line = line.strip()
+                if (len(line) > 0 and line[0] != "#"):
+                    l = line.split(",")
                 for y in l[1:len(l)]:
                     vertices[int(l[0]) - 1].add_neighbor(vertices[int(y) - 1]) # draw edges accordingly
         self.vertex_graph.add_vertices(vertices) # store graph
@@ -40,7 +45,65 @@ class Board():
             if (x.owner != None):
                 return False
         return True
-    
+
+    def read_docks_file(self, file_name):
+        """ Read in the dock order by resource"""
+        try:
+            with open(file_name) as f:
+                lines = f.readlines()
+                assert(len(lines) == 10)
+                for resource in lines: 
+                    resource = resource.strip()
+                    if (len(resource) > 0 and resource[0] != "#"):
+                        if(self.validate_dock(resource)):
+                            new_dock = Dock(resource)
+                            self.docks.append(new_dock)
+                        else:
+                            raise ValueError
+
+        except ValueError:
+            print("Bad value in docks.txt file...")
+            raise
+
+        except AssertionError:
+            print("docks.txt must have 10 lines only.")
+            raise
+
+    def validate_dock(self, resource):
+        if(resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
+            return False
+        else:
+            return True
+
+    def populate_docks(self, vertices):
+
+        vertices[2].set_dock(self.docks[0])
+        vertices[3].set_dock(self.docks[0])
+
+        vertices[5].set_dock(self.docks[1])
+        vertices[6].set_dock(self.docks[1])
+
+        vertices[8].set_dock(self.docks[2])
+        vertices[9].set_dock(self.docks[2])
+
+        vertices[15].set_dock(self.docks[3])
+        vertices[25].set_dock(self.docks[3])
+
+        vertices[16].set_dock(self.docks[4])
+        vertices[27].set_dock(self.docks[4])
+
+        vertices[36].set_dock(self.docks[5])
+        vertices[46].set_dock(self.docks[5])
+
+        vertices[38].set_dock(self.docks[6])
+        vertices[39].set_dock(self.docks[6])
+
+        vertices[49].set_dock(self.docks[7])
+        vertices[50].set_dock(self.docks[7])
+
+        vertices[52].set_dock(self.docks[8])
+        vertices[53].set_dock(self.docks[8])
+                    
     # populates structure that shows which vertices are adjacent to which tiles
     def populate_tile_vertex_map(self):
         self.tile_vertex_map[1] = [1]
