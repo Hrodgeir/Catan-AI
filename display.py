@@ -95,9 +95,16 @@ class Display(tk.Frame):
     def draw_board(self, board):
         if isinstance(board, Board):
             # Initialize canvas
-            canvas = tk.Canvas(self.master, bg='gray', width=500, height=500)
+            canvas = tk.Canvas(self.master, width=500, height=500)
             canvas.place(x=150, y=50)
+
+            # Draw the edges
+            i = 0
+            for v in board.vertices:
+                self.create_edges(canvas, self.coords[i], v)
+                i = i + 1
             
+            # Draw the vertices
             for c in self.coords:
                 self.create_point(canvas, c)
 
@@ -107,13 +114,19 @@ class Display(tk.Frame):
     def create_point(self, canvas, coord):
         if isinstance(coord, Coordinate):
             x = coord.x * 25 + 125
-            y = coord.y * 25
-            canvas.create_oval(x+5, y+5, x+10, y+10, fill="#FFFFFF")
+            y = coord.y * 25 + 5
+            canvas.create_oval(x-3, y-3, x+3, y+3, fill="#FFFFFF")
         else:
             return False
 
-    def create_edge(self, canvas, vertex):
+    def create_edges(self, canvas, coord, vertex):
         if isinstance(vertex, Vertex):
-            canvas.create_line()
+            x = coord.x * 25 + 125
+            y = coord.y * 25 + 5
+            for n in vertex.neighbours:
+                nCoord = self.coords[n-1]
+                nx = nCoord.x * 25 + 125
+                ny = nCoord.y * 25 + 5
+                canvas.create_line(x, y, nx, ny)
         else:
             return False
