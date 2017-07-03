@@ -1,28 +1,30 @@
 """ Board Class """
-import placement
-from graph import *
 from vertex import *
 from dock import *
+from tile import *
 
 class Board():
-    def __init__(self, tiles):
-        self.vertex_graph = Graph()
+    def __init__(self):
+        self.vertices = []
         self.tile_vertex_map = {}
+        self.tiles = {}
+        self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
         self.populate_tile_vertex_map()
-        self.docks = [] 
+        self.docks = []
+        self.read_tiles_file("tiles.txt")
         self.read_docks_file("docks.txt")
         self.read_vertices_file("vertices.txt")
 
     def read_vertices_file(self, file_name):
-        vertices = []
+
         i = 0
 
         # create the vertices
         while (i < 54):
-            vertices.append(Vertex(i + 1, self.tile_vertex_map[i + 1])) #vertex name, sorrounding tile ids
+            self.vertices.append(Vertex(i + 1, self.tile_vertex_map[i + 1])) #vertex name, sorrounding tile ids
             i = i + 1
             
-        self.populate_docks(vertices)
+        self.populate_docks(self.vertices)
 
         # open vertices file to get the edges
         with open(file_name) as f:
@@ -33,17 +35,25 @@ class Board():
                 if (len(line) > 0 and line[0] != "#"):
                     l = line.split(",")
                 for y in l[1:len(l)]:
-                    vertices[int(l[0]) - 1].add_neighbor(vertices[int(y) - 1]) # draw edges accordingly
-        self.vertex_graph.add_vertices(vertices) # store graph
-        #print(str(self.vertex_graph.adjacencyList()))
+                    self.vertices[int(l[0]) - 1].neighbors.append(self.vertices[int(y) - 1].name) # draw edges accordingly   
 
     # check to see if the position is available (enemies at least 2 edges away in board)
     def valid_vertex_for_position(self, vertex_id):
-        for x in self.vertex_graph.vertices[vertex_id]:
-            print(x.name)
+        for x in self.vertices:
             if (x.owner != None):
                 return False
         return True
+
+    def read_tiles_file(self, file_name):
+        with open(file_name) as f:
+            lines = f.readlines()
+
+            for x in lines:
+                x = x.strip()
+                if (len(x) > 0 and x[0] != "#"):
+                    tile_info = x.split(",")
+                    self.tiles[tile_info[0]] = Tile(int(tile_info[0]), tile_info[1].lower(), tile_info[2], tile_info[3])
+                    self.tile_by_dice_val[tile_info[3]].append(int(tile_info[0]))
 
     def read_docks_file(self, file_name):
         """ Read in the dock order by resource"""
@@ -67,6 +77,14 @@ class Board():
         except AssertionError:
             print("docks.txt must have 10 lines only.")
             raise
+
+    # return all the available vertices the user can choose from
+    def get_available_vertices(self):
+        avail_vertices = []
+        for vertex in self.vertices:
+            if (self.valid_vertex_for_position(vertex.name - 1) and vertex.owner == None):
+                avail_vertices.append(vertex)
+        return avail_vertices
 
     def validate_dock(self, resource):
         if (resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
