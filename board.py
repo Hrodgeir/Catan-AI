@@ -6,7 +6,6 @@ from dock import *
 
 class Board():
     def __init__(self, tiles):
-        #self.placements = []
         self.vertex_graph = Graph()
         self.tile_vertex_map = {}
         self.populate_tile_vertex_map()
@@ -70,7 +69,7 @@ class Board():
             raise
 
     def validate_dock(self, resource):
-        if(resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
+        if (resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
             return False
         else:
             return True
