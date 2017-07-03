@@ -3,7 +3,7 @@ from dock import *
 class Vertex:
     def __init__(self, vertex, tile_id):
         self.name = vertex
-        self.neighbors = []
+        self.neighbours = []
         self.dock = None
         self.owner = None
         self.tile_id = tile_id
@@ -16,4 +16,4 @@ class Vertex:
             return False            
 
     def __repr__(self):
-        return "Name: " + str(self.name) + ", Owner: " + self.owner + " ,Neighbours: " + str(self.neighbors) + "\n"
+        return "Name: " + str(self.name) + ", Owner: " + self.owner + " ,Neighbours: " + str(self.neighbours) + "\n"

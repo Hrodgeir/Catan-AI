@@ -35,7 +35,7 @@ class Board():
                 if (len(line) > 0 and line[0] != "#"):
                     l = line.split(",")
                 for y in l[1:len(l)]:
-                    self.vertices[int(l[0]) - 1].neighbors.append(self.vertices[int(y) - 1].name) # draw edges accordingly   
+                    self.vertices[int(l[0]) - 1].neighbours.append(self.vertices[int(y) - 1].name) # draw edges accordingly   
 
     # check to see if the position is available (enemies at least 2 edges away in board)
     def valid_vertex_for_position(self, vertex_id):
@@ -87,7 +87,7 @@ class Board():
         return avail_vertices
 
     def validate_dock(self, resource):
-        if(resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
+        if (resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
             return False
         else:
             return True
