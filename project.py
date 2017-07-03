@@ -1,28 +1,30 @@
-from tile import *
-from board import *
-import graph
-import vertex
 
-def read_tiles_file(file_name):
-    with open(file_name) as f:
-        lines = f.readlines()
-        tiles = []
-        for x in lines:
-            x = x.strip()
-            if (len(x) > 0 and x[0] != "#"):
-                tile_info = x.split(",")
-                tiles.append(Tile(int(x[0]), x[1].lower(), x[2], x[3]))
-        return tiles
+from board import *
+from player import *
+import vertex
 
 def main():
     try:
-        board = Board(read_tiles_file("tiles.txt"))
+        board = Board()
+        players = {}
+        i = 1
+
+        # create players
+        while (i <= 4):
+            players[i] = Player(i, None)
+            i =  i + 1
+    
+        # the vertices that we have to iterate over and make calculations to choose the best
+        avail_vertices = board.get_available_vertices()
 
     except ValueError:
         print("Check .txt files")
 
     except AssertionError:
         print("Check .txt files")
+
+    
+
 
 # add docks
 
