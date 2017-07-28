@@ -4,25 +4,27 @@ from tile import *
 from vertex import *
 
 class Board():
+    """
+    Represent the board as an Board object
+    """
     def __init__(self, random=False):
 
+        self.vertices = []
+        self.tile_vertex_map = {}
+        self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
+        self.populate_tile_vertex_map()
+        
         if random:
-            self.vertices = []
             self.tiles = Tile.generate_layout()
-            self.tile_vertex_map = {}
-            self.populate_tile_vertex_map()
             self.docks = Dock.generate_docks()
-            self.read_vertices_file("vertices.txt")
-        else:
-            self.vertices = []
-            self.tile_vertex_map = {}
+
+        else: 
             self.tiles = []
-            self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
-            self.populate_tile_vertex_map()
             self.docks = []
             self.read_tiles_file("tiles.txt")
             self.read_docks_file("docks.txt")
-            self.read_vertices_file("vertices.txt")
+
+        self.read_vertices_file("vertices.txt")       
 
     def read_vertices_file(self, file_name):
         """
