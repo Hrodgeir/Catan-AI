@@ -11,7 +11,7 @@ def play_game(random):
     try:    
         board = Board(random)
         engine = GameEngine()
-        players = {}
+        players = []
         i = 1
 
         # create players
