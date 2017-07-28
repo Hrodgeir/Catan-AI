@@ -74,18 +74,49 @@ class Display(tk.Frame):
             Coordinate(5,11), #51
             Coordinate(6,10), #52
             Coordinate(7,11), #53
-            Coordinate(8,10), #54
+            Coordinate(8,10)  #54
+        ]
+
+        # Set the tile coordinates
+        self.tile_coords = [
+            Coordinate(2,0), #1
+            Coordinate(4,0), #2
+            Coordinate(6,0), #3
+
+            Coordinate(1,1), #4
+            Coordinate(3,1), #5
+            Coordinate(5,1), #6
+            Coordinate(7,1), #7
+
+            Coordinate(0,2), #8
+            Coordinate(2,2), #9
+            Coordinate(4,2), #10
+            Coordinate(6,2), #11
+            Coordinate(8,2), #12
+
+            Coordinate(1,3), #13
+            Coordinate(3,3), #14
+            Coordinate(5,3), #15
+            Coordinate(7,3), #16
+
+            Coordinate(2,4), #17
+            Coordinate(4,4), #18
+            Coordinate(6,4)  #19
         ]
 
         # Draw the generated board
         self.draw_board(board)
 
     def initialize_window(self):
+        """
+        Initializes the graphical user interface window.
+        """
+
         self.master.title("Catan AI Display")
 
         # Set size of window and central start location
-        w = 800
-        h = 600
+        w = 640
+        h = 720
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()
         x = (sw/2) - (w/2)
@@ -93,40 +124,71 @@ class Display(tk.Frame):
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def draw_board(self, board):
-        if isinstance(board, Board):
-            # Initialize canvas
-            canvas = tk.Canvas(self.master, width=500, height=500)
-            canvas.place(x=150, y=50)
+        """
+        Draw the generated board.
+        """
 
-            # Draw the edges
-            i = 0
-            for v in board.vertices:
-                self.create_edges(canvas, self.coords[i], v)
-                i = i + 1
-            
-            # Draw the vertices
-            for c in self.coords:
-                self.create_point(canvas, c)
+        # Initialize canvas
+        canvas = tk.Canvas(self.master, width=720, height=720)
+        canvas.config(highlightthickness=0, borderwidth=0)
+        canvas.place(x=0, y=100)
 
-        else:
-            return False
+        # Draw the edges
+        self.display_edges(canvas, board)
+        
+        # Draw the vertices
+        self.display_vertices(canvas, board)
 
-    def create_point(self, canvas, coord):
-        if isinstance(coord, Coordinate):
-            x = coord.x * 25 + 125
-            y = coord.y * 25 + 5
-            canvas.create_oval(x-3, y-3, x+3, y+3, fill="#FFFFFF")
-        else:
-            return False
+        # Display the tile info
+        self.display_tile_info(canvas, board)
 
-    def create_edges(self, canvas, coord, vertex):
-        if isinstance(vertex, Vertex):
-            x = coord.x * 25 + 125
-            y = coord.y * 25 + 5
-            for n in vertex.neighbours:
+    def display_vertices(self, canvas, board):
+        """
+        Creates points representing each placement.
+        """
+
+        for c in self.coords:
+            x = c.x * 40 + 125
+            y = c.y * 40 + 5
+            canvas.create_oval(x-5, y-5, x+5, y+5, fill="#FFFFFF")
+
+    def display_edges(self, canvas, board):
+        """
+        Creates the edges between the placements.
+        """
+
+        i = 0
+        for v in board.vertices:
+            coord = self.coords[i]
+
+            x = coord.x * 40 + 125
+            y = coord.y * 40 + 5
+
+            for n in v.neighbours:
                 nCoord = self.coords[n-1]
-                nx = nCoord.x * 25 + 125
-                ny = nCoord.y * 25 + 5
+                nx = nCoord.x * 40 + 125
+                ny = nCoord.y * 40 + 5
                 canvas.create_line(x, y, nx, ny)
-        else:
-            return False
+
+            i = i + 1
+    
+    def display_tile_info(self, canvas, board):
+        """
+        Display the tile info in the middle of each tile.
+        """
+
+        i = 0
+        for t in board.tiles.values():
+            tile_type = t.get_tile_type()
+            dice_value = t.get_dice_value()
+            coord = self.tile_coords[i]
+
+            print(tile_type)
+
+            x = coord.x * 40 + 165
+            y = coord.y * 80 + 60
+
+            canvas.create_text(x, y, text=tile_type)
+            canvas.create_text(x, y+20, text=dice_value)
+            
+            i += 1
