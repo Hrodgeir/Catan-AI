@@ -1,27 +1,38 @@
 """ Board Class """
-from vertex import *
 from dock import *
 from tile import *
+from vertex import *
 
 class Board():
-    def __init__(self):
-        self.vertices = []
-        self.tile_vertex_map = {}
-        self.tiles = {}
-        self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
-        self.populate_tile_vertex_map()
-        self.docks = []
-        self.read_tiles_file("tiles.txt")
-        self.read_docks_file("docks.txt")
-        self.read_vertices_file("vertices.txt")
+    def __init__(self, random=False):
+
+        if random:
+            self.vertices = []
+            self.tiles = Tile.generate_layout()
+            self.tile_vertex_map = {}
+            self.populate_tile_vertex_map()
+            self.docks = Dock.generate_docks()
+            self.read_vertices_file("vertices.txt")
+        else:
+            self.vertices = []
+            self.tile_vertex_map = {}
+            self.tiles = []
+            self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
+            self.populate_tile_vertex_map()
+            self.docks = []
+            self.read_tiles_file("tiles.txt")
+            self.read_docks_file("docks.txt")
+            self.read_vertices_file("vertices.txt")
 
     def read_vertices_file(self, file_name):
-
+        """
+        Read the vertices.txt file
+        """
         i = 0
 
         # create the vertices
         while (i < 54):
-            self.vertices.append(Vertex(i + 1, self.tile_vertex_map[i + 1])) #vertex name, sorrounding tile ids
+            self.vertices.append(Vertex(i + 1, self.tile_vertex_map[i + 1])) #vertex name, surrounding tile ids
             i = i + 1
             
         self.populate_docks(self.vertices)
@@ -37,8 +48,10 @@ class Board():
                 for y in l[1:len(l)]:
                     self.vertices[int(l[0]) - 1].neighbours.append(self.vertices[int(y) - 1].name) # draw edges accordingly   
 
-    # check to see if the position is available (enemies at least 2 edges away in board)
     def valid_vertex_for_position(self, vertex_id):
+        """
+        Check to see if the position is available (enemies at least 2 edges away in board)
+        """
         for x in self.vertices:
             if (x.owner != None):
                 return False
@@ -52,11 +65,13 @@ class Board():
                 x = x.strip()
                 if (len(x) > 0 and x[0] != "#"):
                     tile_info = x.split(",")
-                    self.tiles[tile_info[0]] = Tile(int(tile_info[0]), tile_info[1].lower(), tile_info[2], tile_info[3])
+                    self.tiles.append(Tile(int(tile_info[0]), tile_info[1].lower(), tile_info[2], tile_info[3]))
                     self.tile_by_dice_val[tile_info[3]].append(int(tile_info[0]))
 
     def read_docks_file(self, file_name):
-        """ Read in the dock order by resource"""
+        """
+        Read in the dock order by resource
+        """
         try:
             with open(file_name) as f:
                 lines = f.readlines()
@@ -78,8 +93,10 @@ class Board():
             print("docks.txt must have 10 lines only.")
             raise
 
-    # return all the available vertices the user can choose from
     def get_available_vertices(self):
+        """
+        :return: all the available vertices the user can choose from
+        """
         avail_vertices = []
         for vertex in self.vertices:
             if (self.valid_vertex_for_position(vertex.name - 1) and vertex.owner == None):
@@ -87,6 +104,9 @@ class Board():
         return avail_vertices
 
     def validate_dock(self, resource):
+        """
+        :return: True or false whether or not the dock in docks.txt is valid
+        """
         if (resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
             return False
         else:
@@ -121,8 +141,10 @@ class Board():
         vertices[52].set_dock(self.docks[8])
         vertices[53].set_dock(self.docks[8])
                     
-    # populates structure that shows which vertices are adjacent to which tiles
     def populate_tile_vertex_map(self):
+        """
+        Populates structure that shows which vertices are adjacent to which tiles
+        """
         self.tile_vertex_map[1] = [1]
         self.tile_vertex_map[2] = [1]
         self.tile_vertex_map[3] = [1,2]
@@ -177,5 +199,3 @@ class Board():
         self.tile_vertex_map[52] = [18,19]
         self.tile_vertex_map[53] = [19]
         self.tile_vertex_map[54] = [19]
- 
-

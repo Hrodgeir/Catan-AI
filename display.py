@@ -178,12 +178,10 @@ class Display(tk.Frame):
         """
 
         i = 0
-        for t in board.tiles.values():
+        for t in board.tiles:
             tile_type = t.get_tile_type()
             dice_value = t.get_dice_value()
             coord = self.tile_coords[i]
-
-            print(tile_type)
 
             x = coord.x * 40 + 165
             y = coord.y * 80 + 60

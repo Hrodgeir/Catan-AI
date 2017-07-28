@@ -1,11 +1,14 @@
+import argparse
+
+import vertex
 from board import *
 from display import *
 from player import *
-import vertex
 
-def main():
-    try:
-        board = Board()
+def play_game(random):
+    
+    try:    
+        board = Board(random)
         players = {}
         i = 1
 
@@ -29,4 +32,31 @@ def main():
     except AssertionError:
         print("Check .txt files")
 
-if __name__ == "__main__": main()
+def main():
+
+    parser = argparse.ArgumentParser(description="Play the AI")
+    
+    # Run with random board
+    parser.add_argument('-r', action='store_true')
+    
+    # Run with file input board
+    parser.add_argument('-f', action='store_true')
+
+    # Parse the input args
+    args = parser.parse_args()
+
+    if args.r:
+        play_game(True)
+
+    elif args.f:
+        play_game(False)
+            
+    else:
+        parser.print_help()
+
+if __name__ == "__main__": 
+    """
+    project.py
+    """
+    
+    main()
