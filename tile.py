@@ -21,8 +21,8 @@ class Tile():
 
 	def get_dice_value(self):
 		""" Gets the dice value of the placement """
-		return self.get_dice_value
-		
+		return self.dice_value
+
 	@staticmethod
 	def generate_layout():
 		""" Generates a random 19 tile board layout """
