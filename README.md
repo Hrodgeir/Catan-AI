@@ -7,10 +7,12 @@ Python 3.6
 
 # How to Run
 
-uses randomized board
+Use randomized board:
+```
 python project.py -r 
-
-uses hard coded file values
+```
+Use hard coded file values:
+```
 python project.py -f
-
+```
 ![graph](https://user-images.githubusercontent.com/10039065/27764142-2b1ed264-5e47-11e7-9708-136397a96f5f.jpg)

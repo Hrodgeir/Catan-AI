@@ -201,3 +201,10 @@ class Board():
         self.tile_vertex_map[52] = [18,19]
         self.tile_vertex_map[53] = [19]
         self.tile_vertex_map[54] = [19]
+
+    def __repr__(self):
+        output_vertices = ""
+        for vertex in self.vertices:
+            output_vertices += vertex.__repr__()
+
+        return output_vertices + "\n"

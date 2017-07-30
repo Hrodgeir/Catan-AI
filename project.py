@@ -6,8 +6,12 @@ from display import *
 from player import *
 from game_engine import *
 
-
-def play_game(random):
+def play_game(random, num_players=4):
+    """
+    Run the game\n
+    :param random: Boolean, if true, a random board is created otherwise it is a preset board from .txt's\n
+    :param num_players: OPTIONAL, the number of players who will be playing the game
+    """
     try:    
         board = Board(random)
         engine = GameEngine()
@@ -15,14 +19,15 @@ def play_game(random):
         i = 1
 
         # create players
-        while (i <= 4):
+        while (i <= num_players):
             players.append(Player(i, None))
             i = i + 1
     
         # the vertices that we have to iterate over and make calculations to choose the best
-        avail_vertices = board.get_available_vertices()
+        #avail_vertices = board.get_available_vertices()
 
-        engine.positioning_turns(players)
+        engine.setup_rounds(players, board)
+        print(board.__repr__)
 
         # Initialize the display
         display = Display(board)
@@ -37,7 +42,9 @@ def play_game(random):
         print("Check .txt files")
 
 def main():
-
+    """
+    Play the game with either a random board or a preset board
+    """
     parser = argparse.ArgumentParser(description="Play the AI")
     
     # Run with random board
