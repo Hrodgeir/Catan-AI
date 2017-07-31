@@ -54,9 +54,10 @@ class Board():
         """
         Check to see if the position is available (enemies at least 2 edges away in board)
         """
-        for x in self.vertices:
-            if (x.owner != None):
-                return False
+        #TODO: Check two edges away
+        #for x in self.vertices:
+        #    if (x.owner != None):
+        #        return False
         return True
 
     def read_tiles_file(self, file_name):
@@ -73,6 +74,7 @@ class Board():
     def read_docks_file(self, file_name):
         """
         Read in the dock order by resource
+        :param file_name: The name of the file to read from
         """
         try:
             with open(file_name) as f:
@@ -100,13 +102,16 @@ class Board():
         :return: all the available vertices the user can choose from
         """
         avail_vertices = []
+        
         for vertex in self.vertices:
             if (self.valid_vertex_for_position(vertex.name - 1) and vertex.owner == None):
                 avail_vertices.append(vertex)
+
         return avail_vertices
 
     def validate_dock(self, resource):
         """
+        :param resource: The resource that was entered in the .txt
         :return: True or false whether or not the dock in docks.txt is valid
         """
         if (resource != "all" and resource != "wood" and resource != "wheat" and resource != "sheep" and resource != "brick" and resource != "stone"):
@@ -201,3 +206,10 @@ class Board():
         self.tile_vertex_map[52] = [18,19]
         self.tile_vertex_map[53] = [19]
         self.tile_vertex_map[54] = [19]
+
+    def __repr__(self):
+        output_vertices = ""
+        for vertex in self.vertices:
+            output_vertices += vertex.__repr__()
+
+        return output_vertices + "\n"
