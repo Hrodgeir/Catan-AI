@@ -24,9 +24,8 @@ def play_game(random, num_players=4):
             i = i + 1
     
         # the vertices that we have to iterate over and make calculations to choose the best
-        #avail_vertices = board.get_available_vertices()
 
-        engine.setup_rounds(players, board)
+        board = engine.setup_rounds(players, board)
         print(board.__repr__)
 
         # Initialize the display

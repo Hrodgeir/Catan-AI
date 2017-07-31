@@ -3,7 +3,8 @@ from functools import reduce
 
 """ Tile Class """
 class Tile():
-	""" Tiles represent the type and number associated to each hex
+	""" 
+	Tiles represent the type and number associated to each hex
 	"""
 
 	def __init__(self, Id, tile_type, robber, dice_value):
