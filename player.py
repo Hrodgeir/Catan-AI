@@ -69,11 +69,9 @@ class Player:
         :param strategy: String, The strategy to validate
         """
         strategy_catalogue = ["cities", "settlements", "sheep_monopoly", "wheat_monopoly", "stone_monopoly", "brick_monopoly", "wood_monopoly", "development"]
+        retval = False
         
-        for check_strategy in strategy_catalogue:
-            if strategy == check_strategy:
-                return True
-            else:   
-                pass
-        
-        return False
+        if strategy in strategy_catalogue: 
+            retval = True
+
+        return retval
