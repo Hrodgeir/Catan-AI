@@ -29,7 +29,7 @@ def play_game(random, num_players=4):
         print(board.__repr__)
 
         # Initialize the display
-        display = Display(board)
+        display = Display(board, players)
 
         # Run the display
         display.mainloop()

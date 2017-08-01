@@ -19,8 +19,9 @@ class GameEngine:
         for vertex in board.vertices:
             for tile in rewarded_tiles:
                 if vertex.tile_id == tile:
-                    resource = players[str(vertex.owner)].resources[tile_type] #hope it actually caches the reference
-                    resource = resource + 1
+                    #resource = players[str(vertex.owner)].resources[tile_type] #hope it actually caches the reference
+                    #resource = resource + 1
+                    pass
 
     def setup_rounds(self, players, current_board, total_rounds=2):
         """
