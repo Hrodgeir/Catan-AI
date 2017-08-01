@@ -100,14 +100,22 @@ class GameEngine:
         """
         # weight_array: [stone, sheep, wood, brick, wheat]
 
-        if strategy is "cities":
+        if strategy == "cities":
             weight_array = [1,0.5,0.5,0.5,1]
-        elif strategy is "settlements":
+        elif strategy == "settlements":
             weight_array = [0.5,1,1,1,1]
         #TODO: figure out the best way to deal with different tile type monopolies
-        elif strategy is "monopoly": #currently sheep
+        elif strategy == "stone_monopoly": #currently sheep
+            weight_array = [1,0.5,0.5,0.5,0.5]
+        elif strategy == "sheep_monopoly": #currently sheep
             weight_array = [0.5,1,0.5,0.5,0.5]
-        elif strategy is "development":        
+        elif strategy == "wood_monopoly": #currently sheep
+            weight_array = [0.5,0.5,1,0.5,0.5]
+        elif strategy == "brick_monopoly": #currently sheep
+            weight_array = [0.5,0.5,0.5,1,0.5]
+        elif strategy == "wheat_monopoly": #currently sheep
+            weight_array = [0.5,0.5,0.5,0.5,1]
+        elif strategy == "development":        
             weight_array = [1,1,0.5,0.5,1]
         else:
             weight_array = [1,1,1,1,1]
@@ -121,15 +129,15 @@ class GameEngine:
         :param weight_array: An array of weights that correspond to each tile type and its related strategy
         :return: 1 * the weight
         """
-        if tile_type is "stone":
+        if tile_type == "stone":
             return 1*weight_array[0]
-        elif tile_type is "sheep":
+        elif tile_type == "sheep":
             return 1*weight_array[1]
-        elif tile_type is "wood":
+        elif tile_type == "wood":
             return 1*weight_array[2]
-        elif tile_type is "brick":
+        elif tile_type == "brick":
             return 1*weight_array[3]
-        elif tile_type is "wheat":
+        elif tile_type == "wheat":
             return 1*weight_array[4]
         else:
             return 0

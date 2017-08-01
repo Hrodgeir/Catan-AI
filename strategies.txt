@@ -1,0 +1,4 @@
+settlements
+cities
+wheat_monopoly
+development
