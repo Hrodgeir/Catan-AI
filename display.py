@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font
 from board import *
 
 class Coordinate():
@@ -13,6 +14,10 @@ class Display(tk.Frame):
         super().__init__(self.master)
         self.pack()
         self.initialize_window()
+
+        # Setup custom fonts
+        self.default = font.Font(family='Verdana', size=12)
+        self.header = font.Font(family='Verdana', size=12, weight='bold')
 
         # Set the coordinates
         self.coords = [
@@ -116,7 +121,7 @@ class Display(tk.Frame):
 
         # Set size of window and central start location
         w = 640
-        h = 720
+        h = 640
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()
         x = (sw/2) - (w/2)
@@ -129,9 +134,9 @@ class Display(tk.Frame):
         """
 
         # Initialize canvas
-        canvas = tk.Canvas(self.master, width=720, height=720)
-        canvas.config(highlightthickness=0, borderwidth=0)
-        canvas.place(x=0, y=100)
+        canvas = tk.Canvas(self.master, width=640, height=640)
+        canvas.config(highlightthickness=0, borderwidth=0, bg='gray60')
+        canvas.place(x=0, y=0)
 
         # Draw the edges
         self.display_edges(canvas, board)
@@ -154,7 +159,7 @@ class Display(tk.Frame):
         i = 0
         for c in self.coords:
             x = c.x * 40 + 125
-            y = c.y * 40 + 5
+            y = c.y * 40 + 25
             
 
             # Check to see if the placement is taken
@@ -172,7 +177,7 @@ class Display(tk.Frame):
             else:
                 colour = 'white'
             
-            canvas.create_oval(x-5, y-5, x+5, y+5, fill=colour)
+            canvas.create_oval(x-6, y-6, x+6, y+6, fill=colour, width=2)
 
             i += 1
 
@@ -186,13 +191,13 @@ class Display(tk.Frame):
             coord = self.coords[i]
 
             x = coord.x * 40 + 125
-            y = coord.y * 40 + 5
+            y = coord.y * 40 + 25
 
             for n in v.neighbours:
                 nCoord = self.coords[n-1]
                 nx = nCoord.x * 40 + 125
-                ny = nCoord.y * 40 + 5
-                canvas.create_line(x, y, nx, ny)
+                ny = nCoord.y * 40 + 25
+                canvas.create_line(x, y, nx, ny, width=2)
 
             i = i + 1
     
@@ -208,10 +213,26 @@ class Display(tk.Frame):
             coord = self.tile_coords[i]
 
             x = coord.x * 40 + 165
-            y = coord.y * 80 + 60
+            y = coord.y * 80 + 78
 
-            canvas.create_text(x, y, text=tile_type)
-            canvas.create_text(x, y+20, text=dice_value)
+            canvas.create_text(x, y, text=tile_type.title(), font=self.header)
+
+            # Brighter red corresponds to a higher probability 
+            # that the specific tile dice value is rolled.
+            if dice_value == 0:
+                dice_colour = '#000000'
+            elif dice_value == 2 or dice_value == 12:
+                dice_colour = '#2C0007'
+            elif dice_value == 3 or dice_value == 11:
+                dice_colour = '#59000E'
+            elif dice_value == 4 or dice_value == 10:
+                dice_colour = '#860015'
+            elif dice_value == 5 or dice_value == 9:
+                dice_colour = '#B3001C'
+            elif dice_value == 6 or dice_value == 8:
+                dice_colour = '#E00024'
+            
+            canvas.create_text(x, y+20, text=dice_value, font=self.header, fill=dice_colour)
             
             i += 1
 
@@ -220,17 +241,30 @@ class Display(tk.Frame):
         Display the player info and score below the board.
         """
 
+        # Display the column names
+        canvas.create_text(150, 530, text="Player", font=self.header)
+        canvas.create_text(325, 530, text="Strategy", font=self.header)
+        canvas.create_text(500, 530, text="Score", font=self.header)
+
         # Display the corresponding colour and score for each player.
         for p in players:
             if (p.id == 1):
-                canvas.create_rectangle(120, 500, 110, 510, fill='red')
-                canvas.create_text(330, 505, text=("Player 1\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
+                canvas.create_rectangle(110, 550, 100, 560, fill='red')
+                canvas.create_text(150, 555, text="Player 1", font=self.default)
+                canvas.create_text(325, 555, text=p.strategy, font=self.default)
+                canvas.create_text(500, 555, text="0", font=self.default)
             elif (p.id == 2):
-                canvas.create_rectangle(120, 520, 110, 530, fill='blue')
-                canvas.create_text(330, 525, text=("Player 2\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
+                canvas.create_rectangle(110, 570, 100, 580, fill='blue')
+                canvas.create_text(150, 575, text="Player 2", font=self.default)
+                canvas.create_text(325, 575, text=p.strategy, font=self.default)
+                canvas.create_text(500, 575, text="0", font=self.default)
             elif (p.id == 3):
-                canvas.create_rectangle(120, 540, 110, 550, fill='green')
-                canvas.create_text(330, 545, text=("Player 3\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0))) 
+                canvas.create_rectangle(110, 590, 100, 600, fill='green')
+                canvas.create_text(150, 595, text="Player 3", font=self.default)
+                canvas.create_text(325, 595, text=p.strategy, font=self.default)
+                canvas.create_text(500, 595, text="0", font=self.default)
             elif (p.id == 4):
-                canvas.create_rectangle(120, 560, 110, 570, fill='yellow')
-                canvas.create_text(330, 565, text=("Player 4\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
+                canvas.create_rectangle(110, 610, 100, 620, fill='yellow')
+                canvas.create_text(150, 615, text="Player 4", font=self.default)
+                canvas.create_text(325, 615, text=p.strategy, font=self.default)
+                canvas.create_text(500, 615, text="0", font=self.default)
