@@ -54,10 +54,12 @@ class Board():
         """
         Check to see if the position is available (enemies at least 2 edges away in board)
         """
-        #TODO: Check two edges away
-        #for x in self.vertices:
-        #    if (x.owner != None):
-        #        return False
+        this_vertex = self.vertices[vertex_id]
+        
+        for neighbour in this_vertex.neighbours:
+            neighbour_vertex = self.vertices[neighbour-1]
+            if (neighbour_vertex.owner != None):
+               return False
         return True
 
     def read_tiles_file(self, file_name):

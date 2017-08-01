@@ -42,7 +42,7 @@ class Dock():
 
         # Create the layout based on the random shuffle
         for i in range(9):
-            choice = random.choice(docks)
+            choice = docks.pop(0)
             dock_layout.append(choice)
 
         return dock_layout
