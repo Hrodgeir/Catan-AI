@@ -7,7 +7,7 @@ class Coordinate():
         self.y = y
 
 class Display(tk.Frame):
-    def __init__(self, board):
+    def __init__(self, board, players):
         # Initialize the GUI
         self.master = tk.Tk()
         super().__init__(self.master)
@@ -105,7 +105,7 @@ class Display(tk.Frame):
         ]
 
         # Draw the generated board
-        self.draw_board(board)
+        self.draw_board(board, players)
 
     def initialize_window(self):
         """
@@ -123,7 +123,7 @@ class Display(tk.Frame):
         y = (sh/2) - (h/2)
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-    def draw_board(self, board):
+    def draw_board(self, board, players):
         """
         Draw the generated board.
         """
@@ -142,15 +142,39 @@ class Display(tk.Frame):
         # Display the tile info
         self.display_tile_info(canvas, board)
 
+        # Display the player info
+        self.display_player_info(canvas, board, players)
+
     def display_vertices(self, canvas, board):
         """
         Creates points representing each placement.
         """
 
+        # Keep track of the coordinate index
+        i = 0
         for c in self.coords:
             x = c.x * 40 + 125
             y = c.y * 40 + 5
-            canvas.create_oval(x-5, y-5, x+5, y+5, fill="#FFFFFF")
+            
+
+            # Check to see if the placement is taken
+            placement_owner = board.vertices[i].owner
+
+            if placement_owner != None:
+                if placement_owner.id == 1:
+                    colour = 'red'
+                elif placement_owner.id == 2:
+                    colour = 'blue'
+                elif placement_owner.id == 3:
+                    colour = 'green'
+                elif placement_owner.id == 4:
+                    colour = 'yellow'
+            else:
+                colour = 'white'
+            
+            canvas.create_oval(x-5, y-5, x+5, y+5, fill=colour)
+
+            i += 1
 
     def display_edges(self, canvas, board):
         """
@@ -190,3 +214,23 @@ class Display(tk.Frame):
             canvas.create_text(x, y+20, text=dice_value)
             
             i += 1
+
+    def display_player_info(self, canvas, board, players):
+        """
+        Display the player info and score below the board.
+        """
+
+        # Display the corresponding colour and score for each player.
+        for p in players:
+            if (p.id == 1):
+                canvas.create_rectangle(120, 500, 110, 510, fill='red')
+                canvas.create_text(330, 505, text=("Player 1\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
+            elif (p.id == 2):
+                canvas.create_rectangle(120, 520, 110, 530, fill='blue')
+                canvas.create_text(330, 525, text=("Player 2\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
+            elif (p.id == 3):
+                canvas.create_rectangle(120, 540, 110, 550, fill='green')
+                canvas.create_text(330, 545, text=("Player 3\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0))) 
+            elif (p.id == 4):
+                canvas.create_rectangle(120, 560, 110, 570, fill='yellow')
+                canvas.create_text(330, 565, text=("Player 4\t\t\tStrategy: {}\t\t\tScore: {}".format(p.strategy, 0)))
