@@ -52,38 +52,47 @@ class GameEngine:
         for player in players:
             current_board.current_roll = GameEngine.roll_dice()
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
-            decision = self.evaluate_decision(player, current_board)
-            current_board = self.do_decision(decision, current_board)
+            decision, vertex = self.evaluate_decision(player, current_board)
+            current_board = self.do_decision(decision, current_board, vertex)
 
         return current_board
 
     def evaluate_decision(self, player, current_board):
         """
         """
-
-        decisions = {"do_nothing" : 0, "build_settlement" : 0, "build_city" : 0, "build_road" : 0, "draw_development" : 0, "trade" : 0}
+        decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
+        decision = "do_nothing"
+        vertex = None
+        highest_score = 0.5
         
-        available_resources = player.resources
-
-        if self.question_do_nothing(available_resources):
-            return "do_nothing"
-
-        else:   
-            buyables = self.question_buyable(available_resources)
-
-            for item in buyables:
-                decisions[item] = self.score_buyable(player, item)
-
-            best_value = 0 #this could be the threshold
-            best_decision = "do_nothing"
-
-            for key, value in decisions.items():
-
-                if value > best_value:
-                    best_value = value
-                    best_decision = key
-
-            return decision
+        build_city_scores = self.calculate_city_scores(player, current_board)
+        build_settlement_scores = self.calculate_settlement_scores(player, current_board)
+        build_development_score = self.calculate_development_score(player, current_board)
+        trade_score = self.calculate_trade_score(player, current_board)
+        
+        for idx, score in enumerate(build_city_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_city"
+        
+        for idx, score in enumerate(build_settlement_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_settlement"
+        
+        if build_development_score > highest_score:
+            highest_score = build_development_score
+            vertex = None
+            decision = "draw_development"
+        
+        if trade_score > highest_score:
+            highest_score = trade_score
+            vertex = None
+            decision = "trade"
+        
+        return decision, vertex
 
     def score_buyable(self, player, item):
         if item == "build_settlement":
@@ -98,56 +107,7 @@ class GameEngine:
             print("Something went wrong when trying to score buyable")
             return 0
 
-    def question_buyable(self, available_resources):
-        """
-        """
-        values = []
-        for value in available_resources.values():
-            values.append(value)
-
-        total = 0
-        for value in values:
-            total += value
-
-        buyables = []
-
-        if values[0] > 0 and values[2] > 0 and values[4] > 0:
-            buyables.append("draw_development")
-
-        if values[1] > 0 and value[3] > 0:
-            buyables.append("build_road")
-
-        if values[2] > 1 and values[4] > 2:
-            buyables.append("build_city")
-
-        if values[0] > 0 and values[1] > 0 and values[3] > 0 and values[4] > 0:
-            buyables.append("build_settlement")
-        
-        return buyables
-
-    def question_do_nothing(self, available_resources):
-        """
-        """
-        # sheep, brick, stone, wood, wheat
-        values = []
-        for value in available_resources.values():
-            values.append(value)
-
-        total = 0
-        for value in values:
-            total += value
-
-        if total == 0:
-            return True
-
-        else:
-
-            if len(self.question_buyable(available_resources)) == 0:
-                return True
-            else:
-                return False
-
-    def do_decision(self, decision, current_board):
+    def do_decision(self, decision, current_board, vertex):
         """
         """
 
@@ -166,28 +126,18 @@ class GameEngine:
         else: #"do_nothing"
            
             return current_board
-
-    def score_settlement(self, current_board):
-        #
-        score = 0 
-        return score
-    def score_city(self, current_board):
-        #unable to 
-        score = 0
-        return score
-    def score_road(self, current_board):
-        #higher score if unable to build settlement
-        score = 0
-        return score
-    def score_development_card(self, current_board):
-        #chance to pick up knight or victory point
-        #reduce score if already have 3 knights
-        score = 0
-        return score
-    def draw_development_card(self, current_board, player):
-        """
-        Draw a development card from the deck
-        """
+    
+    def calculate_city_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_settlement_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_development_score(self, player, current_board):
+        return 0
+    
+    def calculate_trade_score(self, player, current_board):
+        return 0
 
     def place_settlement(self, current_board, player):
         """
