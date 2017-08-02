@@ -109,10 +109,8 @@ class Display(tk.Frame):
             Coordinate(6,4)  #19
         ]
 
-        self.initialize_board()
-
         # Draw the generated board, aka first board state
-        #self.draw_board(board_states[0], players)
+        self.initialize_board(board_states, players)
 
     def initialize_window(self):
         """
@@ -123,69 +121,83 @@ class Display(tk.Frame):
 
         # Set size of window and central start location
         w = 640
-        h = 640
+        h = 680
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()
         x = (sw/2) - (w/2)
         y = (sh/2) - (h/2)
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
     
-    def initialize_board(self):
+    def initialize_board(self, board_states, players):
         """
         Initializes the graphical elements of the board.
         """
 
         # Initialize canvas
-        canvas = tk.Canvas(self.master, width=640, height=640)
-        canvas.config(highlightthickness=0, borderwidth=0, bg='gray60')
+        canvas = tk.Canvas(self.master, width=640, height=680)
+        canvas.config(highlightthickness=0, borderwidth=0)
         canvas.place(x=0, y=0)
 
         # Initialize the edges
-        self.initialize_edges(canvas)
+        self.initialize_edges(canvas, board_states[0])
 
         # Initialize the vertices
-        self.initialize_vertices(canvas)
+        self.initialize_vertices(canvas, board_states[0])
 
         # Initialize the tile info
-        self.initialize_tile_info(canvas)
+        self.initialize_tile_info(canvas, board_states[0])
 
         # Initialize the player info
-        self.initialize_player_info(canvas)
+        self.initialize_player_info(canvas, board_states[0], players)
 
-    def initialize_edges(self, canvas):
+        # Keep track of the current state
+        self.state = 0
+        self.lbl_state = tk.Label(canvas, text=("Round: {}".format(self.state)), font=self.header)
+        self.lbl_state.place(x=10, y=10)
 
+        # Create a button to go to the next board state
+        self.btn_next_state = tk.Button(canvas, text="Next Round", font=self.header,
+                                        command=lambda : self.update_vertices(canvas, board_states, self.state+1))
+        self.btn_next_state.place(x=360, y=500)
 
-    def draw_board(self, board, players):
+        # Create a button to go to the previous board state
+        self.btn_previous_state = tk.Button(canvas, text="Previous Round", font=self.header,
+                                        command=lambda : self.update_vertices(canvas, board_states, self.state-1))
+        self.btn_previous_state.place(x=150, y=500)
+
+    def initialize_vertices(self, canvas, board):
         """
-        Draw the generated board.
+        Creates points representing each possible placement.
         """
 
-        # Draw the edges
-        self.display_edges(canvas, board)
-        
-        # Draw the vertices
-        self.display_vertices(canvas, board)
-
-        # Display the tile info
-        self.display_tile_info(canvas, board)
-
-        # Display the player info
-        self.display_player_info(canvas, board, players)
-
-    def display_vertices(self, canvas, board):
-        """
-        Creates points representing each placement.
-        """
+        self.lst_ovals = []
 
         # Keep track of the coordinate index
         i = 0
         for c in self.coords:
             x = c.x * 40 + 125
             y = c.y * 40 + 25
+            
+            # Create a new oval object and add it to the list
+            self.lst_ovals.append(canvas.create_oval(x-6, y-6, x+6, y+6, fill='white', width=2))
+            i += 1
+    
+    def update_vertices(self, canvas, board_states, new_state):
+        """
+        Updates the vertices when the next round button is clicked.
+        """
 
-            # Check to see if the placement is taken
+        # Return if out of bounds
+        if new_state < 0 or new_state > len(board_states):
+            return
+
+        # Get the board state
+        board = board_states[new_state]
+
+        # Keep track of the oval index
+        i = 0
+        for oval in self.lst_ovals:
             placement_owner = board.vertices[i].owner
-
             if placement_owner != None:
                 if placement_owner.id == 1:
                     colour = 'red'
@@ -198,13 +210,16 @@ class Display(tk.Frame):
             else:
                 colour = 'white'
             
-            canvas.create_oval(x-6, y-6, x+6, y+6, fill=colour, width=2)
-
+            canvas.itemconfig(oval, fill=colour)
             i += 1
+        
+        # Update the board state
+        self.state = new_state
+        self.lbl_state.config(text=("Round: {}".format(self.state)))
 
-    def display_edges(self, canvas, board):
+    def initialize_edges(self, canvas, board):
         """
-        Creates the edges between the placements.
+        Creates the edges between the vertices.
         """
 
         i = 0
@@ -222,7 +237,7 @@ class Display(tk.Frame):
 
             i = i + 1
     
-    def display_tile_info(self, canvas, board):
+    def initialize_tile_info(self, canvas, board):
         """
         Display the tile info in the middle of each tile.
         """
@@ -257,35 +272,18 @@ class Display(tk.Frame):
             
             i += 1
 
-    def display_player_info(self, canvas, board, players):
+    def initialize_player_info(self, canvas, board, players):
         """
-        Display the player info and score below the board.
+        Initialize the player info and score below the board.
         """
 
         # Display the column names
-        canvas.create_text(150, 530, text="Player", font=self.header)
-        canvas.create_text(325, 530, text="Strategy", font=self.header)
-        canvas.create_text(500, 530, text="Score", font=self.header)
+        canvas.create_text(150, 570, text="Player", font=self.header)
+        canvas.create_text(325, 570, text="Strategy", font=self.header)
+        canvas.create_text(500, 570, text="Score", font=self.header)
 
-        # Display the corresponding colour and score for each player
-        for p in players:
-            if (p.id == 1):
-                canvas.create_rectangle(110, 550, 100, 560, fill='red')
-                canvas.create_text(150, 555, text="Player 1", font=self.default)
-                canvas.create_text(325, 555, text=p.strategy, font=self.default)
-                canvas.create_text(500, 555, text="0", font=self.default)
-            elif (p.id == 2):
-                canvas.create_rectangle(110, 570, 100, 580, fill='blue')
-                canvas.create_text(150, 575, text="Player 2", font=self.default)
-                canvas.create_text(325, 575, text=p.strategy, font=self.default)
-                canvas.create_text(500, 575, text="0", font=self.default)
-            elif (p.id == 3):
-                canvas.create_rectangle(110, 590, 100, 600, fill='green')
-                canvas.create_text(150, 595, text="Player 3", font=self.default)
-                canvas.create_text(325, 595, text=p.strategy, font=self.default)
-                canvas.create_text(500, 595, text="0", font=self.default)
-            elif (p.id == 4):
-                canvas.create_rectangle(110, 610, 100, 620, fill='yellow')
-                canvas.create_text(150, 615, text="Player 4", font=self.default)
-                canvas.create_text(325, 615, text=p.strategy, font=self.default)
-                canvas.create_text(500, 615, text="0", font=self.default)
+        # Display the corresponding colour and score for the player
+        canvas.create_rectangle(110, 590, 100, 600, fill='red')
+        canvas.create_text(150, 595, text="Player 1", font=self.default)
+        canvas.create_text(325, 595, text=players[0].strategy, font=self.default)
+        canvas.create_text(500, 595, text="0", font=self.default)
