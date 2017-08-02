@@ -29,6 +29,7 @@ class Board():
         self.read_vertices_file("vertices.txt")
         self.development_deck = Board.shuffle_deck() 
         self.populate_vertex_distance_map()
+        self.current_roll = 0 
 
     def read_vertices_file(self, file_name):
         """
@@ -141,6 +142,14 @@ class Board():
             deck_stack.append(deck.pop(0)) '''
 
         return deck
+
+    @staticmethod
+    def roll_dice():
+        """
+        Represent the roll of two dice as two random picks between 1 and 6\n
+        :return: The sum of two random numbers between 1 and 6
+        """
+        return random.randint(1, 6) + random.randint(1, 6)
 
     def populate_docks(self, vertices):
 

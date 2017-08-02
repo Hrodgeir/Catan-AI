@@ -5,7 +5,9 @@ class GameEngine:
     """
     Game Engine controller
     """
-    def roll_dice(self):
+
+    @staticmethod
+    def roll_dice():
         """
         Represent the roll of two dice as two random picks between 1 and 6\n
         :return: The sum of two random numbers between 1 and 6
@@ -48,8 +50,8 @@ class GameEngine:
         """
         """
         for player in players:
-            roll = self.roll_dice()
-            self.give_resources_by_dice_roll(current_board, players, roll)
+            current_board.current_roll = GameEngine.roll_dice()
+            self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
             decision = self.evaluate_decision(player, current_board)
             current_board = self.do_decision(decision, current_board)
 

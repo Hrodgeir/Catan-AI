@@ -7,6 +7,7 @@ class Vertex:
         self.my_dock = None
         self.owner = None
         self.tile_id = tile_id
+        self.is_city = False
 
     def set_dock(self, new_dock):
         """
