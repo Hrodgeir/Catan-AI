@@ -1,4 +1,5 @@
 """ Board Class """
+import math
 from dock import *
 from tile import *
 from vertex import *
@@ -10,6 +11,7 @@ class Board():
     def __init__(self, random=False):
 
         self.vertices = []
+        self.vertex_distance_map = []
         self.tile_vertex_map = {}
         self.tile_by_dice_val = {"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]}
         self.populate_tile_vertex_map()
@@ -24,7 +26,8 @@ class Board():
             self.read_tiles_file("tiles.txt")
             self.read_docks_file("docks.txt")
 
-        self.read_vertices_file("vertices.txt")       
+        self.read_vertices_file("vertices.txt")
+        self.populate_vertex_distance_map()
 
     def read_vertices_file(self, file_name):
         """
@@ -208,6 +211,35 @@ class Board():
         self.tile_vertex_map[52] = [18,19]
         self.tile_vertex_map[53] = [19]
         self.tile_vertex_map[54] = [19]
+        
+    def populate_vertex_distance_map(self):
+        self.vertex_distance_map = [None for v in self.vertices]
+        
+        #dijkstra's Algorithm
+        for vtx in self.vertices:
+            idx = vtx.name - 1
+            
+            distances = [math.inf for v in self.vertices]
+            distances[idx] = 0
+            
+            visited = [False for v in self.vertices]
+            unvisited = [vtx]
+            
+            while unvisited:
+                current = unvisited.pop(0)
+                c_idx = current.name - 1
+                visited[c_idx] = True
+                
+                neighbor_distance = distances[c_idx] + 1
+                for neighbor in current.neighbours:
+                    n_idx = neighbor - 1
+                    if neighbor_distance < distances[n_idx]:
+                        distances[n_idx] = neighbor_distance
+                    
+                    if not visited[n_idx]:
+                        unvisited.append(self.vertices[n_idx])
+            
+            self.vertex_distance_map[idx] = distances
 
     def __repr__(self):
         output_vertices = ""
