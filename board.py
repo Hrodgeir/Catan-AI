@@ -139,11 +139,11 @@ class Board():
         deck_groups = [[type] * num for type, num in deck_catalogue.items()]
         deck = sum(deck_groups, [])
 
-        deck = random.shuffle(deck)
+        random.shuffle(deck)
         deck_stack = []
 
-        ''' for i in range(25):
-            deck_stack.append(deck.pop(0)) '''
+        for i in range(25):
+            deck_stack.append(deck.pop(0))
 
         return deck
 

@@ -133,22 +133,24 @@ class GameEngine:
         resources = player.resources
 
         #  not enough resources
-        if resources[0] == 0 or resource[2] == 0 or resource[4] == 0:
+        if resources["sheep"] == 0 or resources["stone"] == 0 or resources["wheat"] == 0:
             return score
 
         # enough resources, check strategy
-        if strategy = "development":
+        if strategy == "development":
             weight = 1
         else:
             weight = 0.5
 
         # give score for not having enough knights for +2 points
-        if players.knights < 3
+        if player.knights < 3:
             score = score + 1
 
-        cards_pulled = 25 - len(development_deck)
+        else:
+            cards_pulled = 25 - len(current_board.development_deck)
+            deck_ratio = len(current_board.development_deck) / 25
 
-        deck_ratio = player.knigths / len(development_deck)
+            score = score + deck_ratio
 
         return weight*score
     
