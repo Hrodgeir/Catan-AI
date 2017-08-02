@@ -38,7 +38,7 @@ def play_game(random, num_players=4):
         print(board.__repr__)
 
         # Initialize the display
-        display = Display(board, players)
+        display = Display(board_states, players)
 
         # Run the display
         display.mainloop()
