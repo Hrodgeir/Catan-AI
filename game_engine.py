@@ -139,6 +139,9 @@ class GameEngine:
     def calculate_trade_score(self, player, current_board):
         return 0
 
+    def draw_development_card(current_board):
+        return current_board
+
     def place_settlement(self, current_board, player):
         """
         Place a settlement on the current playing board\n

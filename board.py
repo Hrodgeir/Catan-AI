@@ -143,14 +143,6 @@ class Board():
 
         return deck
 
-    @staticmethod
-    def roll_dice():
-        """
-        Represent the roll of two dice as two random picks between 1 and 6\n
-        :return: The sum of two random numbers between 1 and 6
-        """
-        return random.randint(1, 6) + random.randint(1, 6)
-
     def populate_docks(self, vertices):
 
         vertices[2].set_dock(self.docks[0])
