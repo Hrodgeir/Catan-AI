@@ -1,3 +1,4 @@
+import math
 import random
 
 class Player:
@@ -9,9 +10,22 @@ class Player:
         self.id = Id
         self.strategy = strategy
         self.resources = {"sheep": 0, "brick": 0, "stone": 0, "wood": 0, "wheat": 0}
+        self.vertex_distances = []
 
     def set_strategy(self, new_strategy):
         self.new_strategy = new_strategy
+        
+    def update_distances(self, acquired_vertex, board):
+        if self.vertex_distances == []:
+            self.vertex_distances = [math.inf for v in board.vertices]
+    
+        acq_id = acquired_vertex.name - 1
+        distances = board.vertex_distance_map[acq_id]
+        
+        for vtx in board.vertices:
+            idx = vtx.name - 1
+            if distances[idx] < self.vertex_distances[idx]:
+                self.vertex_distances[idx] = distances[idx]
 
     @staticmethod
     def generate_strategies(num_of_strategies):
