@@ -5,7 +5,9 @@ class GameEngine:
     """
     Game Engine controller
     """
-    def roll_dice(self):
+
+    @staticmethod
+    def roll_dice():
         """
         Represent the roll of two dice as two random picks between 1 and 6\n
         :return: The sum of two random numbers between 1 and 6
@@ -17,11 +19,13 @@ class GameEngine:
         rewarded_tiles = board.tile_by_dice_val[str(dice_val)]
 
         for vertex in board.vertices:
-            for tile in rewarded_tiles:
-                if vertex.tile_id == tile:
-                    #resource = players[str(vertex.owner)].resources[tile_type] #hope it actually caches the reference
-                    #resource = resource + 1
-                    pass
+            for tile_id in rewarded_tiles:
+                if tile_id in vertex.tile_id:
+                    tile = board.tiles[tile_id]
+                    type = tile.tile_type 
+                    
+                    resources = players[str(vertex.owner)].resources
+                    resources[type] = resources[type] + 1
 
     def setup_rounds(self, players, current_board, total_rounds=2):
         """
@@ -49,20 +53,97 @@ class GameEngine:
         """
         """
         for player in players:
-            doll = self.roll_dice()
-            decision = self.evaluate_decision(player, current_board)
-            self.do_decision(decision)
+            current_board.current_roll = GameEngine.roll_dice()
+            self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
+            decision, vertex = self.evaluate_decision(player, current_board)
+            current_board = self.do_decision(decision, current_board, vertex)
 
         return current_board
 
     def evaluate_decision(self, player, current_board):
-
+        """
+        """
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
-        decision = decisions[0]
-        return decision
+        decision = "do_nothing"
+        vertex = None
+        highest_score = 0.5
+        
+        build_city_scores = self.calculate_city_scores(player, current_board)
+        build_settlement_scores = self.calculate_settlement_scores(player, current_board)
+        build_development_score = self.calculate_development_score(player, current_board)
+        trade_score = self.calculate_trade_score(player, current_board)
+        
+        for idx, score in enumerate(build_city_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_city"
+        
+        for idx, score in enumerate(build_settlement_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_settlement"
+        
+        if build_development_score > highest_score:
+            highest_score = build_development_score
+            vertex = None
+            decision = "draw_development"
+        
+        if trade_score > highest_score:
+            highest_score = trade_score
+            vertex = None
+            decision = "trade"
+        
+        return decision, vertex
 
-    def do_decision(self, decision):
-        return
+    def score_buyable(self, player, item):
+        if item == "build_settlement":
+            return self.score_settlement(player)
+        elif item == "build_city":
+            return self.score_city(player)
+        elif item == "build_road":
+            return self.score_road(player)
+        elif item == "draw_development":
+            return self.score_development_card(player)
+        else:
+            print("Something went wrong when trying to score buyable")
+            return 0
+
+    def do_decision(self, decision, current_board, vertex):
+        """
+        """
+
+        if decision == "trade":
+            pass
+        elif decision == "build_settlement":
+            pass
+        elif decision == "build_city":
+            pass
+        elif decision == "build_road":
+            pass
+        elif decision == "draw_development":
+            current_board = self.draw_development_card(current_board)
+            return current_board
+
+        else: #"do_nothing"
+           
+            return current_board
+    
+    def calculate_city_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_settlement_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_development_score(self, player, current_board):
+        return 0
+    
+    def calculate_trade_score(self, player, current_board):
+        return 0
+
+    def draw_development_card(current_board):
+        return current_board
 
     def place_settlement(self, current_board, player):
         """
