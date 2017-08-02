@@ -17,7 +17,9 @@ def play_game(random, num_players=4):
         if num_players > 4 or num_players < 1:
             raise ValueError
 
-        board = Board(random)
+        board_states = []
+
+        board_states.append(Board(random))
         engine = GameEngine()
         players = []
         i = 1
@@ -31,11 +33,16 @@ def play_game(random, num_players=4):
         while (i <= num_players):
             players.append(Player(i, strategy_list[i-1]))
             i = i + 1
-    
+
         # the vertices that we have to iterate over and make calculations to choose the best
 
-        board = engine.setup_rounds(players, board)
-        print(board.__repr__)
+        board_states.append(engine.setup_rounds(players, board_states[0]))
+        rounds = 100
+
+        for i in range(rounds):
+            board_states.append(engine.take_turn(players, board_states[i+1]))
+
+        #print(board.__repr__)
 
         # Initialize the display
         display = Display(board_states, players)

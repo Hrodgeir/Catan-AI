@@ -47,6 +47,25 @@ class GameEngine:
 
         return current_board
 
+    def take_turn(self, players, current_board):
+        """
+        """
+        for player in players:
+            doll = self.roll_dice()
+            decision = self.evaluate_decision(player, current_board)
+            self.do_decision(decision)
+
+        return current_board
+
+    def evaluate_decision(self, player, current_board):
+
+        decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
+        decision = decisions[0]
+        return decision
+
+    def do_decision(self, decision):
+        return
+
     def place_settlement(self, current_board, player):
         """
         Place a settlement on the current playing board\n
