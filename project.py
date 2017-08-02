@@ -1,6 +1,7 @@
 import argparse
 
 import vertex
+import copy
 from board import *
 from display import *
 from player import *
@@ -36,16 +37,18 @@ def play_game(random, num_players=4):
 
         # the vertices that we have to iterate over and make calculations to choose the best
 
-        board_states.append(engine.setup_rounds(players, board_states[0]))
+        current_board = copy.deepcopy(board_states[0])
+        board_states.append(engine.setup_rounds(players, current_board))
         rounds = 100
 
         for i in range(rounds):
-            board_states.append(engine.take_turn(players, board_states[i+1]))
+            current_board = copy.deepcopy(board_states[i+1])
+            board_states.append(engine.take_turn(players, current_board))
 
         #print(board.__repr__)
 
         # Initialize the display
-        display = Display(board_states[0], players)
+        display = Display(board_states, players)
 
         # Run the display
         display.mainloop()
