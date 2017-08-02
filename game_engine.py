@@ -31,18 +31,16 @@ class GameEngine:
         :return: The state of the board after setup rounds
         """
         round_counter = 0
+        reverse = False
 
         while(round_counter < total_rounds):
-            for player in players:
-                #print("Player " + str(player.id))
-                current_board = self.place_settlement(current_board, player)
-
-            for player in reversed(players):
+            order = (players if not reverse else reversed(players))
+            for player in order:
                 #print("Player " + str(player.id))
                 current_board = self.place_settlement(current_board, player)
             
-            # two rounds have passed
-            round_counter = round_counter + 2
+            round_counter = round_counter + 1
+            reverse = not reverse
 
         return current_board
 
@@ -199,7 +197,10 @@ class GameEngine:
 
         #find best placement
         vertex_id = self.search_board(current_board, player.strategy)
-        current_board.vertices[vertex_id-1].set_owner(player)
+        vertex = current_board.vertices[vertex_id-1]
+        
+        vertex.set_owner(player)
+        player.update_distances(vertex, current_board)
         return current_board
 
     def search_board(self, current_board, strategy):
