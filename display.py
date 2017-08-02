@@ -8,7 +8,7 @@ class Coordinate():
         self.y = y
 
 class Display(tk.Frame):
-    def __init__(self, board_states, players):
+    def __init__(self, board, players):
         # Initialize the GUI
         self.master = tk.Tk()
         super().__init__(self.master)
@@ -109,10 +109,8 @@ class Display(tk.Frame):
             Coordinate(6,4)  #19
         ]
 
-        self.initialize_board()
-
-        # Draw the generated board, aka first board state
-        #self.draw_board(board_states[0], players)
+        # Draw the generated board
+        self.draw_board(board, players)
 
     def initialize_window(self):
         """
@@ -129,36 +127,16 @@ class Display(tk.Frame):
         x = (sw/2) - (w/2)
         y = (sh/2) - (h/2)
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
-    
-    def initialize_board(self):
+
+    def draw_board(self, board, players):
         """
-        Initializes the graphical elements of the board.
+        Draw the generated board.
         """
 
         # Initialize canvas
         canvas = tk.Canvas(self.master, width=640, height=640)
         canvas.config(highlightthickness=0, borderwidth=0, bg='gray60')
         canvas.place(x=0, y=0)
-
-        # Initialize the edges
-        self.initialize_edges(canvas)
-
-        # Initialize the vertices
-        self.initialize_vertices(canvas)
-
-        # Initialize the tile info
-        self.initialize_tile_info(canvas)
-
-        # Initialize the player info
-        self.initialize_player_info(canvas)
-
-    def initialize_edges(self, canvas):
-
-
-    def draw_board(self, board, players):
-        """
-        Draw the generated board.
-        """
 
         # Draw the edges
         self.display_edges(canvas, board)
@@ -182,6 +160,7 @@ class Display(tk.Frame):
         for c in self.coords:
             x = c.x * 40 + 125
             y = c.y * 40 + 25
+            
 
             # Check to see if the placement is taken
             placement_owner = board.vertices[i].owner
@@ -239,7 +218,7 @@ class Display(tk.Frame):
             canvas.create_text(x, y, text=tile_type.title(), font=self.header)
 
             # Brighter red corresponds to a higher probability 
-            # that the specific tile dice value is rolled
+            # that the specific tile dice value is rolled.
             if dice_value == 0:
                 dice_colour = '#000000'
             elif dice_value == 2 or dice_value == 12:
@@ -267,7 +246,7 @@ class Display(tk.Frame):
         canvas.create_text(325, 530, text="Strategy", font=self.header)
         canvas.create_text(500, 530, text="Score", font=self.header)
 
-        # Display the corresponding colour and score for each player
+        # Display the corresponding colour and score for each player.
         for p in players:
             if (p.id == 1):
                 canvas.create_rectangle(110, 550, 100, 560, fill='red')
