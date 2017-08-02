@@ -50,18 +50,60 @@ class GameEngine:
         """
         for player in players:
             doll = self.roll_dice()
-            decision = self.evaluate_decision(player, current_board)
-            self.do_decision(decision)
+            decision, vertex = self.evaluate_decision(player, current_board)
+            self.do_decision(decision, vertex)
 
         return current_board
 
     def evaluate_decision(self, player, current_board):
 
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
-        decision = decisions[0]
-        return decision
+        decision = "do_nothing"
+        vertex = None
+        highest_score = 0.5
+        
+        build_city_scores = self.calculate_city_scores(player, current_board)
+        build_settlement_scores = self.calculate_settlement_scores(player, current_board)
+        build_development_score = self.calculate_development_score(player, current_board)
+        trade_score = self.calculate_trade_score(player, current_board)
+        
+        for idx, score in enumerate(build_city_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_city"
+        
+        for idx, score in enumerate(build_settlement_scores):
+            if score > highest_score:
+                highest_score = score
+                vertex = current_board.vertices[idx]
+                decision = "build_settlement"
+        
+        if build_development_score > highest_score:
+            highest_score = build_development_score
+            vertex = None
+            decision = "draw_development"
+        
+        if trade_score > highest_score:
+            highest_score = trade_score
+            vertex = None
+            decision = "trade"
+        
+        return decision, vertex
+    
+    def calculate_city_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_settlement_scores(self, player, current_board):
+        return [0 for vtx in current_board.vertices]
+    
+    def calculate_development_score(self, player, current_board):
+        return 0
+    
+    def calculate_trade_score(self, player, current_board):
+        return 0
 
-    def do_decision(self, decision):
+    def do_decision(self, decision, vertex):
         return
 
     def place_settlement(self, current_board, player):
