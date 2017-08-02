@@ -24,7 +24,8 @@ class Board():
             self.read_tiles_file("tiles.txt")
             self.read_docks_file("docks.txt")
 
-        self.read_vertices_file("vertices.txt")       
+        self.read_vertices_file("vertices.txt")
+        self.development_deck = Board.shuffle_deck()      
 
     def read_vertices_file(self, file_name):
         """
@@ -120,6 +121,23 @@ class Board():
             return False
         else:
             return True
+
+    @staticmethod
+    def shuffle_deck():
+        """
+        Shuffle the development card deck
+        """
+        deck_catalogue =  {"knight" : 14, "victory_point": 5, "blank" : 6}
+        deck_groups = [[type] * num for type, num in deck_catalogue.items()]
+        deck = sum(deck_groups, [])
+
+        deck = random.shuffle(deck)
+        deck_stack = []
+
+        ''' for i in range(25):
+            deck_stack.append(deck.pop(0)) '''
+
+        return deck
 
     def populate_docks(self, vertices):
 

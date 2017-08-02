@@ -19,9 +19,8 @@ class GameEngine:
         for vertex in board.vertices:
             for tile in rewarded_tiles:
                 if vertex.tile_id == tile:
-                    #resource = players[str(vertex.owner)].resources[tile_type] #hope it actually caches the reference
-                    #resource = resource + 1
-                    pass
+                    resource = players[str(vertex.owner)].resources[tile] #hope it actually caches the reference
+                    resource = resource + 1
 
     def setup_rounds(self, players, current_board, total_rounds=2):
         """
@@ -51,20 +50,144 @@ class GameEngine:
         """
         """
         for player in players:
-            doll = self.roll_dice()
+            roll = self.roll_dice()
+            self.give_resources_by_dice_roll(current_board, players, roll)
             decision = self.evaluate_decision(player, current_board)
-            self.do_decision(decision)
+            current_board = self.do_decision(decision, current_board)
 
         return current_board
 
     def evaluate_decision(self, player, current_board):
+        """
+        """
 
-        decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
-        decision = decisions[0]
-        return decision
+        decisions = {"do_nothing" : 0, "build_settlement" : 0, "build_city" : 0, "build_road" : 0, "draw_development" : 0, "trade" : 0}
+        
+        available_resources = player.resources
 
-    def do_decision(self, decision):
-        return
+        if self.question_do_nothing(available_resources):
+            return "do_nothing"
+
+        else:   
+            buyables = self.question_buyable(available_resources)
+
+            for item in buyables:
+                decisions[item] = self.score_buyable(player, item)
+
+            best_value = 0 #this could be the threshold
+            best_decision = "do_nothing"
+
+            for key, value in decisions.items():
+
+                if value > best_value:
+                    best_value = value
+                    best_decision = key
+
+            return decision
+
+    def score_buyable(self, player, item):
+        if item == "build_settlement":
+            return self.score_settlement(player)
+        elif item == "build_city":
+            return self.score_city(player)
+        elif item == "build_road":
+            return self.score_road(player)
+        elif item == "draw_development":
+            return self.score_development_card(player)
+        else:
+            print("Something went wrong when trying to score buyable")
+            return 0
+
+    def question_buyable(self, available_resources):
+        """
+        """
+        values = []
+        for value in available_resources.values():
+            values.append(value)
+
+        total = 0
+        for value in values:
+            total += value
+
+        buyables = []
+
+        if values[0] > 0 and values[2] > 0 and values[4] > 0:
+            buyables.append("draw_development")
+
+        if values[1] > 0 and value[3] > 0:
+            buyables.append("build_road")
+
+        if values[2] > 1 and values[4] > 2:
+            buyables.append("build_city")
+
+        if values[0] > 0 and values[1] > 0 and values[3] > 0 and values[4] > 0:
+            buyables.append("build_settlement")
+        
+        return buyables
+
+    def question_do_nothing(self, available_resources):
+        """
+        """
+        # sheep, brick, stone, wood, wheat
+        values = []
+        for value in available_resources.values():
+            values.append(value)
+
+        total = 0
+        for value in values:
+            total += value
+
+        if total == 0:
+            return True
+
+        else:
+
+            if len(self.question_buyable(available_resources)) == 0:
+                return True
+            else:
+                return False
+
+    def do_decision(self, decision, current_board):
+        """
+        """
+
+        if decision == "trade":
+            pass
+        elif decision == "build_settlement":
+            pass
+        elif decision == "build_city":
+            pass
+        elif decision == "build_road":
+            pass
+        elif decision == "draw_development":
+            current_board = self.draw_development_card(current_board)
+            return current_board
+
+        else: #"do_nothing"
+           
+            return current_board
+
+    def score_settlement(self, current_board):
+        #
+        score = 0 
+        return score
+    def score_city(self, current_board):
+        #unable to 
+        score = 0
+        return score
+    def score_road(self, current_board):
+        #higher score if unable to build settlement
+        score = 0
+        return score
+    def score_development_card(self, current_board):
+        #chance to pick up knight or victory point
+        #reduce score if already have 3 knights
+        score = 0
+        return score
+    def draw_development_card(self, current_board, player):
+        """
+        Draw a development card from the deck
+        """
 
     def place_settlement(self, current_board, player):
         """
