@@ -19,8 +19,6 @@ def play_game(random, num_players=4):
             raise ValueError
 
         board_states = []
-
-        board_states.append(Board(random))
         engine = GameEngine()
         players = []
         i = 1
@@ -34,16 +32,21 @@ def play_game(random, num_players=4):
         while (i <= num_players):
             players.append(Player(i, strategy_list[i-1]))
             i = i + 1
+        
+        current_board = Board(random)
+        current_board.player_state = players
+        board_states.append(copy.deepcopy(current_board))
 
         # the vertices that we have to iterate over and make calculations to choose the best
 
-        current_board = copy.deepcopy(board_states[0])
-        board_states.append(engine.setup_rounds(players, current_board))
+        engine.setup_rounds(players, current_board)
+        board_states.append(copy.deepcopy(current_board))
+        
         rounds = 100
 
         for i in range(rounds):
-            current_board = copy.deepcopy(board_states[i+1])
-            board_states.append(engine.take_turn(players, current_board))
+            engine.take_turn(players, current_board)
+            board_states.append(copy.deepcopy(current_board))
 
         #print(board.__repr__)
 
