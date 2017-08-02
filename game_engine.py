@@ -19,13 +19,14 @@ class GameEngine:
         rewarded_tiles = board.tile_by_dice_val[str(dice_val)]
 
         for vertex in board.vertices:
-            for tile_id in rewarded_tiles:
-                if tile_id in vertex.tile_id:
-                    tile = board.tiles[tile_id]
-                    type = tile.tile_type 
-                    
-                    resources = players[str(vertex.owner)].resources
-                    resources[type] = resources[type] + 1
+            if vertex.owner != None:
+                for tile_id in rewarded_tiles:
+                    if tile_id in vertex.tile_id:
+                        tile = board.tiles[tile_id - 1]
+                        type = tile.tile_type
+                        
+                        resources = players[vertex.owner.id - 1].resources
+                        resources[type] = resources[type] + 1
 
     def setup_rounds(self, players, current_board, total_rounds=2):
         """

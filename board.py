@@ -25,11 +25,16 @@ class Board():
             self.docks = []
             self.read_tiles_file("tiles.txt")
             self.read_docks_file("docks.txt")
-
+        
+        for tile in self.tiles:
+            if tile.dice_value != 0 and tile.tile_type != "desert":
+                self.tile_by_dice_val[str(tile.dice_value)].append(tile.Id)
+        
         self.read_vertices_file("vertices.txt")
         self.development_deck = Board.shuffle_deck() 
         self.populate_vertex_distance_map()
         self.current_roll = 0 
+        self.player_state = []
 
     def read_vertices_file(self, file_name):
         """
@@ -76,7 +81,6 @@ class Board():
                 if (len(x) > 0 and x[0] != "#"):
                     tile_info = x.split(",")
                     self.tiles.append(Tile(int(tile_info[0]), tile_info[1].lower(), tile_info[2], tile_info[3]))
-                    self.tile_by_dice_val[tile_info[3]].append(int(tile_info[0]))
 
     def read_docks_file(self, file_name):
         """
