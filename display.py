@@ -155,14 +155,18 @@ class Display(tk.Frame):
         self.lbl_state = tk.Label(canvas, text=("Round: {}".format(self.state)), font=self.header)
         self.lbl_state.place(x=10, y=10)
 
+        # Keep track of the dice value rolled
+        self.lbl_dice_value = tk.Label(canvas, text=("Dice Value: {}".format(board_states[0].current_roll)), font=self.header)
+        self.lbl_dice_value.place(x=10, y=30)
+
         # Create a button to go to the next board state
         self.btn_next_state = tk.Button(canvas, text="Next Round", font=self.header,
-                                        command=lambda : self.update_vertices(canvas, board_states, self.state+1))
+                                        command=lambda : self.update(canvas, board_states, self.state+1))
         self.btn_next_state.place(x=360, y=500)
 
         # Create a button to go to the previous board state
         self.btn_previous_state = tk.Button(canvas, text="Previous Round", font=self.header,
-                                        command=lambda : self.update_vertices(canvas, board_states, self.state-1))
+                                        command=lambda : self.update(canvas, board_states, self.state-1))
         self.btn_previous_state.place(x=150, y=500)
 
     def initialize_vertices(self, canvas, board):
@@ -182,9 +186,9 @@ class Display(tk.Frame):
             self.lst_ovals.append(canvas.create_oval(x-6, y-6, x+6, y+6, fill='white', width=2))
             i += 1
     
-    def update_vertices(self, canvas, board_states, new_state):
+    def update(self, canvas, board_states, new_state):
         """
-        Updates the vertices when the next round button is clicked.
+        Updates the board when the next round button is clicked.
         """
 
         # Return if out of bounds
@@ -216,6 +220,11 @@ class Display(tk.Frame):
         # Update the board state
         self.state = new_state
         self.lbl_state.config(text=("Round: {}".format(self.state)))
+
+        # Update dice roll
+        self.lbl_dice_value.config(text=("Dice Value: {}".format(board_states[self.state].current_roll)))
+
+        # TODO: Update the score value
 
     def initialize_edges(self, canvas, board):
         """
@@ -286,4 +295,4 @@ class Display(tk.Frame):
         canvas.create_rectangle(110, 590, 100, 600, fill='red')
         canvas.create_text(150, 595, text="Player 1", font=self.default)
         canvas.create_text(325, 595, text=players[0].strategy, font=self.default)
-        canvas.create_text(500, 595, text="0", font=self.default)
+        self.player_score = canvas.create_text(500, 595, text="0", font=self.default)
