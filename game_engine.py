@@ -55,6 +55,7 @@ class GameEngine:
         for player in players:
             current_board.current_roll = GameEngine.roll_dice()
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
+            print(player.resources)
             decision, vertex = self.evaluate_decision(player, current_board)
             current_board = self.do_decision(decision, current_board, vertex)
 
@@ -97,19 +98,6 @@ class GameEngine:
         
         return decision, vertex
 
-    def score_buyable(self, player, item):
-        if item == "build_settlement":
-            return self.score_settlement(player)
-        elif item == "build_city":
-            return self.score_city(player)
-        elif item == "build_road":
-            return self.score_road(player)
-        elif item == "draw_development":
-            return self.score_development_card(player)
-        else:
-            print("Something went wrong when trying to score buyable")
-            return 0
-
     def do_decision(self, decision, current_board, vertex):
         """
         """
@@ -137,12 +125,47 @@ class GameEngine:
         return [0 for vtx in current_board.vertices]
     
     def calculate_development_score(self, player, current_board):
-        return 0
+
+        score = 0
+        weight = 0
+        strategy = player.strategy
+        resources = player.resources
+
+        #  not enough resources
+        if resources[0] == 0 or resource[2] == 0 or resource[4] == 0:
+            return score
+
+        # enough resources, check strategy
+        if strategy = "development":
+            weight = 1
+        else:
+            weight = 0.5
+
+        # give score for not having enough knights for +2 points
+        if players.knights < 3
+            score = score + 1
+
+        cards_pulled = 25 - len(development_deck)
+
+        deck_ratio = player.knigths / len(development_deck)
+
+        return weight*score
     
     def calculate_trade_score(self, player, current_board):
         return 0
 
-    def draw_development_card(current_board):
+    def draw_development_card(self, current_board, player):
+        card = current_board.development_deck.pop(0)
+
+        if card == "knight":
+            player.knights = player.knights + 1
+            
+        elif card == "victory_point":
+            player.points = player.points + 1
+        
+        else:
+            pass
+
         return current_board
 
     def place_settlement(self, current_board, player):
@@ -242,7 +265,3 @@ class GameEngine:
             return 1*weight_array[4]
         else:
             return 0
-
-        
-    
-        

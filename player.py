@@ -11,6 +11,8 @@ class Player:
         self.strategy = strategy
         self.resources = {"sheep": 0, "brick": 0, "stone": 0, "wood": 0, "wheat": 0}
         self.vertex_distances = []
+        self.points = 0
+        self.knights = 0
 
     def set_strategy(self, new_strategy):
         self.new_strategy = new_strategy
