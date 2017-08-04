@@ -41,6 +41,7 @@ class Board():
         """
         Read the vertices.txt file
         """
+
         i = 0
 
         # create the vertices
@@ -65,6 +66,7 @@ class Board():
         """
         Check to see if the position is available (enemies at least 2 edges away in board)
         """
+        
         this_vertex = self.vertices[vertex_id]
 
         for neighbour in this_vertex.neighbours:
