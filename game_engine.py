@@ -57,7 +57,7 @@ class GameEngine:
             current_board.current_roll = GameEngine.roll_dice()
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
             print(player.resources)
-            decision, vertex = self.evaluate_decision(player, current_board)
+            decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
             current_board = self.do_decision(decision, current_board, vertex)
 
         return current_board
@@ -68,36 +68,46 @@ class GameEngine:
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
         decision = "do_nothing"
         vertex = None
+        trade_get = None #What to trade to receive
+        trade_from = None #What to trade from
         highest_score = 0.5
         
         build_city_scores = self.calculate_city_scores(player, current_board)
         build_settlement_scores = self.calculate_settlement_scores(player, current_board)
         build_development_score = self.calculate_development_score(player, current_board)
-        trade_score = self.calculate_trade_score(player, current_board)
+        trade_score, trade_g, trade_f = self.calculate_trade_score(player, current_board)
         
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
                 highest_score = score
                 vertex = current_board.vertices[idx]
+                trade_get = None
+                trade_from = None
                 decision = "build_city"
         
         for idx, score in enumerate(build_settlement_scores):
             if score > highest_score:
                 highest_score = score
                 vertex = current_board.vertices[idx]
+                trade_get = None
+                trade_from = None
                 decision = "build_settlement"
         
         if build_development_score > highest_score:
             highest_score = build_development_score
             vertex = None
+            trade_get = None
+            trade_from = None
             decision = "draw_development"
         
         if trade_score > highest_score:
             highest_score = trade_score
             vertex = None
+            trade_get = trade_g
+            trade_from = trade_f
             decision = "trade"
         
-        return decision, vertex
+        return decision, vertex, trade_get, trade_from
 
     def do_decision(self, decision, current_board, vertex):
         """
@@ -155,7 +165,34 @@ class GameEngine:
         return weight*score
     
     def calculate_trade_score(self, player, current_board):
-        return 0
+        score = 0
+        weight = 0
+        trade_g = None
+        trade_f = None
+
+        resources = player.resources
+        strategy = player.strategy
+
+        if strategy == "settlements":
+            excess_resource = get_excess(resources)
+        elif strategy == "cities":
+            pass
+        elif strategy == "sheep_monopoly":
+            pass
+        elif strategy == "wheat_monopoly":
+            pass
+        elif strategy == "stone_monopoly":
+            pass
+        elif strategy == "brick_monopoly":
+            pass
+        elif strategy == "wood_monopoly":
+            pass
+        elif strategy == "development_monopoly":
+            pass
+        else:
+            weight = 0
+
+        return score*weight, trade_g, trade_f
 
     def draw_development_card(self, current_board, player):
         card = current_board.development_deck.pop(0)

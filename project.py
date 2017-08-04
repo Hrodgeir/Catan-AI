@@ -57,7 +57,7 @@ def play_game(random, num_players=4):
         display.mainloop()
 
     except ValueError:
-        print("The number of playes must be 4 or less")
+        print("The number of players must be 4 or less")
 
     except AssertionError:
         print("Check .txt files")
