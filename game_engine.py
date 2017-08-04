@@ -58,7 +58,10 @@ class GameEngine:
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
             print(player.resources)
             decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
-            current_board = self.do_decision(decision, current_board, vertex)
+
+            print("Decision made: " + str(decision))
+
+            current_board = self.do_decision(decision, player, current_board, vertex, trade_g, trade_f)
 
         return current_board
 
@@ -109,7 +112,7 @@ class GameEngine:
         
         return decision, vertex, trade_get, trade_from
 
-    def do_decision(self, decision, current_board, vertex):
+    def do_decision(self, decision, player, current_board, vertex, trade_get, trade_from):
         """
         """
 
@@ -122,7 +125,7 @@ class GameEngine:
         elif decision == "build_road":
             pass
         elif decision == "draw_development":
-            current_board = self.draw_development_card(current_board)
+            current_board = self.draw_development_card(current_board, player)
             return current_board
 
         else: #"do_nothing"
@@ -136,7 +139,12 @@ class GameEngine:
         return [0 for vtx in current_board.vertices]
     
     def calculate_development_score(self, player, current_board):
-
+        """
+        Calculate the score for choosing a development card this turn
+        :param player: The player object who is deciding what to do
+        :param current_board: The current state of the board
+        :return: the score * the weight based on the player strategy
+        """
         score = 0
         weight = 0
         strategy = player.strategy
@@ -163,8 +171,28 @@ class GameEngine:
             score = score + deck_ratio
 
         return weight*score
+
+    def draw_development_card(self, current_board, player):
+        card = current_board.development_deck.pop(0)
+
+        if card == "knight":
+            player.knights = player.knights + 1
+            
+        elif card == "victory_point":
+            player.points = player.points + 1
+        
+        else:
+            pass
+
+        return current_board
     
     def calculate_trade_score(self, player, current_board):
+        """
+        Calculate the score for choosing a development card this turn
+        :param player: The player object who is deciding what to do
+        :param current_board: The current state of the board
+        :return: the score * the weight based on the player strategy, trade_g: what the player gets, trade_f: what the player trades
+        """
         score = 0
         weight = 0
         trade_g = None
@@ -172,9 +200,10 @@ class GameEngine:
 
         resources = player.resources
         strategy = player.strategy
+        excess_resources = self.get_excess(resources)
 
         if strategy == "settlements":
-            excess_resource = get_excess(resources)
+            pass
         elif strategy == "cities":
             pass
         elif strategy == "sheep_monopoly":
@@ -194,19 +223,18 @@ class GameEngine:
 
         return score*weight, trade_g, trade_f
 
-    def draw_development_card(self, current_board, player):
-        card = current_board.development_deck.pop(0)
+    def get_excess(self, resources):
+        """
+        Get the resources that in excess of 4 or more
+        :param resources: Dictionary of resources of the player
+        :return: List of resources in excess
+        """
+        excess_resources = []
+        for key, value in resources.items():
+            if value >= 4:
+                excess_resources.append(key)
 
-        if card == "knight":
-            player.knights = player.knights + 1
-            
-        elif card == "victory_point":
-            player.points = player.points + 1
-        
-        else:
-            pass
-
-        return current_board
+        return excess_resources
 
     def place_settlement(self, current_board, player):
         """

@@ -31,7 +31,8 @@ class Board():
                 self.tile_by_dice_val[str(tile.dice_value)].append(tile.Id)
         
         self.read_vertices_file("vertices.txt")
-        self.development_deck = Board.shuffle_deck() 
+        self.development_deck = Board.shuffle_deck()
+        print("Development Deck: " + str(self.development_deck)) 
         self.populate_vertex_distance_map()
         self.current_roll = 0 
         self.player_state = []
