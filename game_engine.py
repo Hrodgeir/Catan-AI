@@ -59,12 +59,13 @@ class GameEngine:
             print("Dice Roll: " + str(current_board.current_roll))
             
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
+
             print("Current Resources: " + str(player.resources))
             
             decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
             print("Decision made: " + str(decision) + "\n")
 
-            current_board = self.do_decision(decision, player, current_board, vertex, trade_g, trade_f)
+            current_board = self.do_decision(player, decision, current_board, vertex, trade_g, trade_f)
 
         return current_board
 
@@ -116,7 +117,8 @@ class GameEngine:
         
         return decision, vertex, trade_get, trade_from
 
-    def do_decision(self, decision, player, current_board, vertex, trade_get, trade_from):
+
+    def do_decision(self, player, decision, current_board, vertex, trade_get, trade_from):
         """
         Perform the decision
         """
@@ -128,7 +130,13 @@ class GameEngine:
             return current_board
 
         elif decision == "build_settlement":
-            pass
+            idx = vertex.name - 1
+            distance = player.vertex_distances[idx]
+            player.resources["wood"] = player.resources["wood"] - distance - 1
+            player.resources["brick"] = player.resources["brick"] - distance - 1
+            player.resources["wheat"] = player.resources["wheat"] - 1
+            player.resources["sheep"] = player.resources["sheep"] - 1
+            vertex.set_owner(player)
         elif decision == "build_city":
             pass
         elif decision == "build_road":
@@ -145,7 +153,35 @@ class GameEngine:
         return [0 for vtx in current_board.vertices]
     
     def calculate_settlement_scores(self, player, current_board):
-        return [0 for vtx in current_board.vertices]
+        resources = player.resources
+        amounts = [resources["wood"], resources["brick"], resources["wheat"], resources["sheep"]]
+        
+        scores = [0 for vtx in current_board.vertices]
+        if any(x == 0 for x in amounts):
+            return scores
+        
+        for vtx in current_board.vertices:
+            idx = vtx.name - 1
+            distance = player.vertex_distances[idx]
+            costs = [distance + 1, distance + 1, 1, 1]
+            after = [amounts[i] - costs[i] for i in range(len(amounts))]
+            
+            if vtx.owner is not None:
+                continue
+            if any([current_board.vertices[id - 1].owner is not None for id in vtx.neighbours]):
+                continue
+            if any([x < 0 for x in after]):
+                continue
+            
+            scores[idx] = (2 - distance) * 0.1
+            for tile_id in vtx.tile_id:
+                tile_idx = tile_id - 1
+                tile = current_board.tiles[tile_idx]
+                tile_type = tile.get_tile_type()
+                base_score = GameEngine.get_score(tile_type, player.strategy)
+                scores[idx] += base_score # tile.probability
+            
+        return scores
     
     def calculate_development_score(self, player, current_board):
         """
