@@ -17,16 +17,23 @@ class Tile():
 		return repr([self.Id, self.tile_type, self.robber, self.dice_value])
 
 	def get_tile_type(self):
-		""" Gets the type of the placement """
+		"""
+		Gets the type of the placement
+		"""
 		return self.tile_type
 
 	def get_dice_value(self):
-		""" Gets the dice value of the placement """
+		"""
+		Gets the dice value of the placement
+		"""
 		return self.dice_value
 
 	@staticmethod
 	def generate_layout():
-		""" Generates a random 19 tile board layout """
+		"""
+		Generates a random 19 tile board layout
+		:return: Tile layout of board
+		"""
 		tile_catalogue = { 'stone': 3, 'sheep': 4, 'wood': 4, 'brick': 3, 'wheat': 4, 'desert': 1 }
 		tile_groups = [[type] * num for type, num in tile_catalogue.items()]
 		tiles = sum(tile_groups, [])
@@ -67,7 +74,9 @@ class Tile():
 	
 	@staticmethod
 	def compute_adjacency(width, height):
-		""" Computes the tile adjacency for a tile layout of the given width and height """
+		"""
+		Computes the tile adjacency for a tile layout of the given width and height
+		"""
 		adjacency = []
 		
 		mid = int(height / 2)

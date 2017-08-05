@@ -192,7 +192,7 @@ class Display(tk.Frame):
         """
 
         # Return if out of bounds
-        if new_state < 0 or new_state > len(board_states):
+        if new_state < 0 or new_state > len(board_states) - 1:
             return
 
         # Get the board state

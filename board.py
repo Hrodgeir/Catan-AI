@@ -32,7 +32,7 @@ class Board():
         
         self.read_vertices_file("vertices.txt")
         self.development_deck = Board.shuffle_deck()
-        print("Development Deck: " + str(self.development_deck)) 
+        #print("Development Deck: " + str(self.development_deck)) 
         self.populate_vertex_distance_map()
         self.current_roll = 0 
         self.player_state = []
@@ -76,6 +76,9 @@ class Board():
         return True
 
     def read_tiles_file(self, file_name):
+        """
+        Read tiles.txt to create a custom board
+        """
         with open(file_name) as f:
             lines = f.readlines()
 
@@ -148,9 +151,12 @@ class Board():
         for i in range(25):
             deck_stack.append(deck.pop(0))
 
-        return deck
+        return deck_stack
 
     def populate_docks(self, vertices):
+        """
+        Populate teh docks based on the hard coded vertices that require docks
+        """
 
         vertices[2].set_dock(self.docks[0])
         vertices[3].set_dock(self.docks[0])
@@ -239,6 +245,9 @@ class Board():
         self.tile_vertex_map[54] = [19]
         
     def populate_vertex_distance_map(self):
+        """
+        Distance from a settlement node
+        """
         self.vertex_distance_map = [None for v in self.vertices]
         
         #dijkstra's Algorithm

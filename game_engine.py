@@ -52,14 +52,17 @@ class GameEngine:
 
     def take_turn(self, players, current_board):
         """
+        Take a turn (Roll Dice, Get Resources, Make a Decision, Do Decision)
         """
         for player in players:
             current_board.current_roll = GameEngine.roll_dice()
+            print("Dice Roll: " + str(current_board.current_roll))
+            
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
-            print(player.resources)
+            print("Current Resources: " + str(player.resources))
+            
             decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
-
-            print("Decision made: " + str(decision))
+            print("Decision made: " + str(decision) + "\n")
 
             current_board = self.do_decision(decision, player, current_board, vertex, trade_g, trade_f)
 
@@ -67,6 +70,7 @@ class GameEngine:
 
     def evaluate_decision(self, player, current_board):
         """
+        Evaluate all possible decisions based on weighted heuristics
         """
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
         decision = "do_nothing"
@@ -114,10 +118,15 @@ class GameEngine:
 
     def do_decision(self, decision, player, current_board, vertex, trade_get, trade_from):
         """
+        Perform the decision
         """
 
         if decision == "trade":
-            pass
+            player.resources[trade_from] -= 4 
+            player.resources[trade_get] += 1
+
+            return current_board
+
         elif decision == "build_settlement":
             pass
         elif decision == "build_city":
@@ -200,41 +209,130 @@ class GameEngine:
 
         resources = player.resources
         strategy = player.strategy
-        excess_resources = self.get_excess(resources)
+        excess_resources, zero_resources = self.get_excess_and_zeros(resources)
+        lowest_resource = self.get_lowest_resource(resources)
 
         if strategy == "settlements":
-            pass
+            if "stone" in excess_resources:
+                trade_f = "stone"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "cities":
-            pass
+            if "wheat" not in excess_resources and "stone" not in excess_resources:
+                random.shuffle(excess_resources)
+                trade_f = excess_resources.pop(0)
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "sheep_monopoly":
-            pass
+            if "sheep" in excess_resources:
+                trade_f = "sheep"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+            
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "wheat_monopoly":
-            pass
+            if "wheat" in excess_resources:
+                trade_f = "wheat"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "stone_monopoly":
-            pass
+            if "stone" in excess_resources:
+                trade_f = "stone"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "brick_monopoly":
-            pass
+            if "brick" in excess_resources:
+                trade_f = "brick"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         elif strategy == "wood_monopoly":
-            pass
-        elif strategy == "development_monopoly":
-            pass
+            if "wood" in excess_resources:
+                trade_f = "wood"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "development":
+            if "brick" in excess_resources:
+                trade_f = "brick"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif "wood" in excess_resources:
+                trade_f = "wood"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
         else:
             weight = 0
 
         return score*weight, trade_g, trade_f
 
-    def get_excess(self, resources):
+    def get_excess_and_zeros(self, resources):
         """
-        Get the resources that in excess of 4 or more
+        Get the resources that in excess of 4 or more and the resources at 0
         :param resources: Dictionary of resources of the player
-        :return: List of resources in excess
+        :return: List of resources in excess, and list of resources at zero
         """
         excess_resources = []
+        zero_resources = []
         for key, value in resources.items():
             if value >= 4:
                 excess_resources.append(key)
 
-        return excess_resources
+            elif value == 0:
+                zero_resources.append(key)
+
+        return excess_resources, zero_resources
+
+    def get_lowest_resource(self, resources):
+        lowest_resource = min(resources, key=resources.get)
+        return lowest_resource
+
+    def random_excess_for_lowest(self, excess_resources, lowest_resource):
+        random.shuffle(excess_resources)
+        trade_f = excess_resources.pop(0)
+        weight = 0.75
+        score = 1
+        trade_g = lowest_resource
+
+        return weight, score, trade_g, trade_f
 
     def place_settlement(self, current_board, player):
         """
