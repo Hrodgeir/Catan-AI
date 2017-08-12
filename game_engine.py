@@ -203,7 +203,7 @@ class GameEngine:
         if strategy == "development":
             weight = 1
         else:
-            weight = 0.5
+            weight = 0.65
 
         # give score for not having enough knights for +2 points
         if player.knights < 3:
@@ -467,3 +467,27 @@ class GameEngine:
             return 1*weight_array[4]
         else:
             return 0
+
+    def evaluate_win(self, players):
+        """
+        Evaluate if a player has won
+        :param players: The list of players playing
+        :return: True or False if someone has won, and who won
+        """
+        
+        has_won = False
+        winner = None
+        temp_points = 0
+
+        for player in players:
+            if player.knights >= 3:
+                temp_points = temp_points + 2
+            temp_points = temp_points + player.points
+
+            if temp_points >= 10:
+                has_won = True
+                winner = player
+                # Add points for having knights
+                player.points = player.points + 2
+
+        return has_won, winner
