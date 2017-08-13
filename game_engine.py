@@ -12,6 +12,7 @@ class GameEngine:
         Represent the roll of two dice as two random picks between 1 and 6\n
         :return: The sum of two random numbers between 1 and 6
         """
+
         return random.randint(1, 6) + random.randint(1, 6)
 
     #TODO: actually test this method
@@ -36,6 +37,7 @@ class GameEngine:
         :param total_rounds: OPTIONAL, the number of rounds to play, default 2
         :return: The state of the board after setup rounds
         """
+
         round_counter = 0
         reverse = False
 
@@ -54,6 +56,7 @@ class GameEngine:
         """
         Take a turn (Roll Dice, Get Resources, Make a Decision, Do Decision)
         """
+
         for player in players:
             current_board.current_roll = GameEngine.roll_dice()
             print("Dice Roll: " + str(current_board.current_roll))
@@ -73,44 +76,37 @@ class GameEngine:
         """
         Evaluate all possible decisions based on weighted heuristics
         """
+
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
         decision = "do_nothing"
         vertex = None
-        trade_get = None #What to trade to receive
-        trade_from = None #What to trade from
+        trade_get = None # What to receive from a trade
+        trade_from = None # What to trade away
         highest_score = 0.5
         
         build_city_scores = self.calculate_city_scores(player, current_board)
         build_settlement_scores = self.calculate_settlement_scores(player, current_board)
         build_development_score = self.calculate_development_score(player, current_board)
         trade_score, trade_g, trade_f = self.calculate_trade_score(player, current_board)
-        
+
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
                 highest_score = score
                 vertex = current_board.vertices[idx]
-                trade_get = None
-                trade_from = None
                 decision = "build_city"
         
         for idx, score in enumerate(build_settlement_scores):
             if score > highest_score:
                 highest_score = score
                 vertex = current_board.vertices[idx]
-                trade_get = None
-                trade_from = None
                 decision = "build_settlement"
         
         if build_development_score > highest_score:
             highest_score = build_development_score
-            vertex = None
-            trade_get = None
-            trade_from = None
             decision = "draw_development"
         
         if trade_score > highest_score:
             highest_score = trade_score
-            vertex = None
             trade_get = trade_g
             trade_from = trade_f
             decision = "trade"
@@ -126,7 +122,6 @@ class GameEngine:
         if decision == "trade":
             player.resources[trade_from] -= 4 
             player.resources[trade_get] += 1
-
             return current_board
 
         elif decision == "build_settlement":
@@ -137,15 +132,18 @@ class GameEngine:
             player.resources["wheat"] = player.resources["wheat"] - 1
             player.resources["sheep"] = player.resources["sheep"] - 1
             vertex.set_owner(player)
+
         elif decision == "build_city":
             pass
+
         elif decision == "build_road":
             pass
+
         elif decision == "draw_development":
             current_board = self.draw_development_card(current_board, player)
             return current_board
 
-        else: #"do_nothing"
+        else: # "do_nothing"
            
             return current_board
     
@@ -190,6 +188,7 @@ class GameEngine:
         :param current_board: The current state of the board
         :return: the score * the weight based on the player strategy
         """
+        
         score = 0
         weight = 0
         strategy = player.strategy
@@ -207,17 +206,25 @@ class GameEngine:
 
         # give score for not having enough knights for +2 points
         if player.knights < 3:
-            score = score + 1
+            score += 1
 
-        else:
-            cards_pulled = 25 - len(current_board.development_deck)
-            deck_ratio = len(current_board.development_deck) / 25
+        #TODO Adjust stuff
+        cards_pulled = 25 - len(current_board.development_deck)
+        deck_ratio = len(current_board.development_deck) / 25
 
-            score = score + deck_ratio
+        score += deck_ratio
 
         return weight*score
 
     def draw_development_card(self, current_board, player):
+        """
+        Draws a development card.
+        """
+
+        # Ensure there's at least one card in the deck
+        if len(current_board.development_deck) < 1:
+            return
+
         card = current_board.development_deck.pop(0)
 
         if card == "knight":
@@ -225,9 +232,6 @@ class GameEngine:
             
         elif card == "victory_point":
             player.points = player.points + 1
-        
-        else:
-            pass
 
         return current_board
     
@@ -238,6 +242,7 @@ class GameEngine:
         :param current_board: The current state of the board
         :return: the score * the weight based on the player strategy, trade_g: what the player gets, trade_f: what the player trades
         """
+
         score = 0
         weight = 0
         trade_g = None
@@ -409,7 +414,7 @@ class GameEngine:
         best_score = 0
         vertex_id = next(iter(scores))
 
-        #find the best vertex for placement
+        # find the best vertex for placement
         for key, value in scores.items():
             if value > best_score:
                 best_score = value
@@ -424,6 +429,7 @@ class GameEngine:
         :param strategy: The strategy the player is using
         :return: The score the tile adds to the vertex
         """
+
         # weight_array: [stone, sheep, wood, brick, wheat]
 
         if strategy == "cities":
@@ -472,10 +478,9 @@ class GameEngine:
         """
         Evaluate if a player has won
         :param players: The list of players playing
-        :return: True or False if someone has won, and who won
+        :return: Winner
         """
         
-        has_won = False
         winner = None
         temp_points = 0
 
@@ -485,9 +490,8 @@ class GameEngine:
             temp_points = temp_points + player.points
 
             if temp_points >= 10:
-                has_won = True
                 winner = player
                 # Add points for having knights
                 player.points = player.points + 2
 
-        return has_won, winner
+        return winner

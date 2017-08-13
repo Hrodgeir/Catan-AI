@@ -32,7 +32,6 @@ class Board():
         
         self.read_vertices_file("vertices.txt")
         self.development_deck = Board.shuffle_deck()
-        #print("Development Deck: " + str(self.development_deck)) 
         self.populate_vertex_distance_map()
         self.current_roll = 0 
         self.player_state = []
@@ -141,6 +140,7 @@ class Board():
         """
         Shuffle the development card deck
         """
+        
         deck_catalogue =  {"knight" : 14, "victory_point": 5, "blank" : 6}
         deck_groups = [[type] * num for type, num in deck_catalogue.items()]
         deck = sum(deck_groups, [])
@@ -155,7 +155,7 @@ class Board():
 
     def populate_docks(self, vertices):
         """
-        Populate teh docks based on the hard coded vertices that require docks
+        Populate the docks based on the hard coded vertices that require docks
         """
 
         vertices[2].set_dock(self.docks[0])
@@ -189,6 +189,7 @@ class Board():
         """
         Populates structure that shows which vertices are adjacent to which tiles
         """
+
         self.tile_vertex_map[1] = [1]
         self.tile_vertex_map[2] = [1]
         self.tile_vertex_map[3] = [1,2]
@@ -248,6 +249,7 @@ class Board():
         """
         Distance from a settlement node
         """
+
         self.vertex_distance_map = [None for v in self.vertices]
         
         #dijkstra's Algorithm
