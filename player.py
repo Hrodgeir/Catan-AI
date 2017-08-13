@@ -13,6 +13,7 @@ class Player:
         self.vertex_distances = []
         self.points = 0
         self.knights = 0
+        self.decision = ""
 
     def set_strategy(self, new_strategy):
         self.new_strategy = new_strategy
