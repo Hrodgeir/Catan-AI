@@ -159,15 +159,29 @@ class Display(tk.Frame):
         self.lbl_dice_value = tk.Label(canvas, text=("Dice Value: {}".format(board_states[0].current_roll)), font=self.header)
         self.lbl_dice_value.place(x=10, y=30)
 
-        # Create a button to go to the next board state
-        self.btn_next_state = tk.Button(canvas, text="Next Round", font=self.header,
-                                        command=lambda : self.update(canvas, board_states, self.state+1))
-        self.btn_next_state.place(x=420, y=500)
+        # Keep track of the decision made
+        self.lbl_decision = tk.Label(canvas, text=("Decision Made: "), font=self.header)
+        self.lbl_decision.place(x=10, y=625)
+
+        # Create a button to go to the first board state
+        self.btn_next_state = tk.Button(canvas, text="First Round", font=self.header,
+                                        command=lambda : self.update(canvas, board_states, 0))
+        self.btn_next_state.place(x=75, y=500)
 
         # Create a button to go to the previous board state
         self.btn_previous_state = tk.Button(canvas, text="Previous Round", font=self.header,
                                             command=lambda : self.update(canvas, board_states, self.state-1))
         self.btn_previous_state.place(x=225, y=500)
+
+        # Create a button to go to the next board state
+        self.btn_next_state = tk.Button(canvas, text="Next Round", font=self.header,
+                                        command=lambda : self.update(canvas, board_states, self.state+1))
+        self.btn_next_state.place(x=420, y=500)
+
+        # Create a button to go to the last board state
+        self.btn_next_state = tk.Button(canvas, text="Last Round", font=self.header,
+                                        command=lambda : self.update(canvas, board_states, len(board_states)-1))
+        self.btn_next_state.place(x=575, y=500)
 
     def initialize_vertices(self, canvas, board):
         """
@@ -223,6 +237,10 @@ class Display(tk.Frame):
 
         # Update dice roll
         self.lbl_dice_value.config(text=("Dice Value: {}".format(board_states[self.state].current_roll)))
+
+        # Update the decision made
+        decision_made = board.player_state[0].decision.replace("_"," ").title()
+        self.lbl_decision.config(text=("Decision Made: {}".format(decision_made)))
 
         # Update the resource card count
         player = board_states[new_state].player_state[0]
