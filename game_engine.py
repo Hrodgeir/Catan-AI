@@ -135,10 +135,16 @@ class GameEngine:
             player.resources["wheat"] = player.resources["wheat"] - 1
             player.resources["sheep"] = player.resources["sheep"] - 1
             vertex.set_owner(player)
+            player.points += 1
 
         elif decision == "build_city":
-            pass
+            idx = vertex.name - 1
+            player.resources["wheat"] -= 2
+            player.resources["stone"] -= 3
+            vertex.is_city = True
+            player.points += 1
 
+        # Probably not really required
         elif decision == "build_road":
             pass
 
@@ -151,29 +157,78 @@ class GameEngine:
             return current_board
     
     def calculate_city_scores(self, player, current_board):
-        return [0 for vtx in current_board.vertices]
+        """
+        Calculate the scores for placing a city.
+        """
+
+        # Get a list of the resources required
+        resources = player.resources
+        amounts = [resources["wheat"], resources["stone"]]
+
+        # Initialize the scores to 0
+        scores = [0 for vtx in current_board.vertices]
+
+        # Ensure that there are at least 2 wheat and 3 stone
+        if amounts[0] < 2 or amounts[1] < 3:
+            return scores
+
+        # Iterate over the player owned, non-city vertices
+        for vtx in current_board.vertices:
+            idx = vtx.name - 1
+            costs = [2, 3]
+            after = [amounts[i] - costs[i] for i in range(len(amounts))]
+
+            # Skip empty vertex
+            if vtx.owner is None:
+                continue
+            # Skip if it's already a city
+            if vtx.is_city:
+                continue
+
+            scores[idx] = 0.8
+            for tile_id in vtx.tile_id:
+                tile_idx = tile_id - 1
+                tile = current_board.tiles[tile_idx]
+                tile_type = tile.get_tile_type()
+                base_score = GameEngine.get_score(tile_type, player.strategy)
+                scores[idx] += base_score
+
+        return scores
     
     def calculate_settlement_scores(self, player, current_board):
+        """
+        Calculate the scores for placing a settlement.
+        """
+
+        # Get a list of the resources required
         resources = player.resources
         amounts = [resources["wood"], resources["brick"], resources["wheat"], resources["sheep"]]
         
+        # Initialize the scores to 0
         scores = [0 for vtx in current_board.vertices]
+
+        # Ensure there are at least one of each resource
         if any(x == 0 for x in amounts):
             return scores
         
+        # Iterate over every vertex, and determine the best spot for a settlement
         for vtx in current_board.vertices:
             idx = vtx.name - 1
             distance = player.vertex_distances[idx]
             costs = [distance + 1, distance + 1, 1, 1]
             after = [amounts[i] - costs[i] for i in range(len(amounts))]
             
+            # Skip is the vertex is already owned
             if vtx.owner is not None:
                 continue
+            # Skip if the vertex has any direct neighbours
             if any([current_board.vertices[id - 1].owner is not None for id in vtx.neighbours]):
                 continue
+            # Skip if a required resource is negative after the purchase
             if any([x < 0 for x in after]):
                 continue
             
+            # Calculate the score based on tile type and strategy
             scores[idx] = (2 - distance) * 0.1
             for tile_id in vtx.tile_id:
                 tile_idx = tile_id - 1
@@ -240,7 +295,7 @@ class GameEngine:
     
     def calculate_trade_score(self, player, current_board):
         """
-        Calculate the score for choosing a development card this turn
+        Calculate the score for trading cards this turn
         :param player: The player object who is deciding what to do
         :param current_board: The current state of the board
         :return: the score * the weight based on the player strategy, trade_g: what the player gets, trade_f: what the player trades
