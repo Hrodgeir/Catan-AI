@@ -68,6 +68,9 @@ class GameEngine:
             decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
             print("Decision made: " + str(decision) + "\n")
 
+            # Set the decision for the GUI
+            player.decision = decision
+
             current_board = self.do_decision(player, decision, current_board, vertex, trade_g, trade_f)
 
         return current_board

@@ -8,6 +8,7 @@ class Board():
     """
     Represent the board as an Board object
     """
+    
     def __init__(self, random=False):
 
         self.vertices = []
@@ -140,7 +141,7 @@ class Board():
         """
         Shuffle the development card deck
         """
-        
+
         deck_catalogue =  {"knight" : 14, "victory_point": 5, "blank" : 6}
         deck_groups = [[type] * num for type, num in deck_catalogue.items()]
         deck = sum(deck_groups, [])
