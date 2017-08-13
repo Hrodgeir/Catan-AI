@@ -31,7 +31,7 @@ class Board():
                 self.tile_by_dice_val[str(tile.dice_value)].append(tile.Id)
         
         self.read_vertices_file("vertices.txt")
-        self.development_deck = Board.shuffle_deck() 
+        self.development_deck = Board.shuffle_deck()
         self.populate_vertex_distance_map()
         self.current_roll = 0 
         self.player_state = []
@@ -75,6 +75,9 @@ class Board():
         return True
 
     def read_tiles_file(self, file_name):
+        """
+        Read tiles.txt to create a custom board
+        """
         with open(file_name) as f:
             lines = f.readlines()
 
@@ -137,19 +140,23 @@ class Board():
         """
         Shuffle the development card deck
         """
+        
         deck_catalogue =  {"knight" : 14, "victory_point": 5, "blank" : 6}
         deck_groups = [[type] * num for type, num in deck_catalogue.items()]
         deck = sum(deck_groups, [])
 
-        deck = random.shuffle(deck)
+        random.shuffle(deck)
         deck_stack = []
 
-        ''' for i in range(25):
-            deck_stack.append(deck.pop(0)) '''
+        for i in range(25):
+            deck_stack.append(deck.pop(0))
 
-        return deck
+        return deck_stack
 
     def populate_docks(self, vertices):
+        """
+        Populate the docks based on the hard coded vertices that require docks
+        """
 
         vertices[2].set_dock(self.docks[0])
         vertices[3].set_dock(self.docks[0])
@@ -182,6 +189,7 @@ class Board():
         """
         Populates structure that shows which vertices are adjacent to which tiles
         """
+
         self.tile_vertex_map[1] = [1]
         self.tile_vertex_map[2] = [1]
         self.tile_vertex_map[3] = [1,2]
@@ -238,6 +246,10 @@ class Board():
         self.tile_vertex_map[54] = [19]
         
     def populate_vertex_distance_map(self):
+        """
+        Distance from a settlement node
+        """
+
         self.vertex_distance_map = [None for v in self.vertices]
         
         #dijkstra's Algorithm

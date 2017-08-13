@@ -8,7 +8,7 @@ class Coordinate():
         self.y = y
 
 class Display(tk.Frame):
-    def __init__(self, board_states, players):
+    def __init__(self, board_states, players, winner):
         # Initialize the GUI
         self.master = tk.Tk()
         super().__init__(self.master)
@@ -110,7 +110,7 @@ class Display(tk.Frame):
         ]
 
         # Draw the generated board, aka first board state
-        self.initialize_board(board_states, players)
+        self.initialize_board(board_states, players, winner)
 
     def initialize_window(self):
         """
@@ -128,7 +128,7 @@ class Display(tk.Frame):
         y = (sh/2) - (h/2)
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
     
-    def initialize_board(self, board_states, players):
+    def initialize_board(self, board_states, players, winner):
         """
         Initializes the graphical elements of the board.
         """
@@ -192,7 +192,7 @@ class Display(tk.Frame):
         """
 
         # Return if out of bounds
-        if new_state < 0 or new_state > len(board_states):
+        if new_state < 0 or new_state > len(board_states) - 1:
             return
 
         # Get the board state

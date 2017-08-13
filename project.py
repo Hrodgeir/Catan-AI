@@ -42,24 +42,31 @@ def play_game(random, num_players=4):
         engine.setup_rounds(players, current_board)
         board_states.append(copy.deepcopy(current_board))
         
-        rounds = 100
+        rounds = 50
+        has_won = False
 
         for i in range(rounds):
+            print("Turn: " + str(i+1))
             engine.take_turn(players, current_board)
             board_states.append(copy.deepcopy(current_board))
+            winner = engine.evaluate_win(players)
+            if winner != None:
+                break
 
         #print(board.__repr__)
 
         # Initialize the display
-        display = Display(board_states, players)
+        display = Display(board_states, players, winner)
 
         # Run the display
         display.mainloop()
 
-    except ValueError:
-        print("The number of playes must be 4 or less")
+    except ValueError as ex:
+        print(ex)
+        print("The number of players must be 4 or less")
 
-    except AssertionError:
+    except AssertionError as ex:
+        print(ex)
         print("Check .txt files")
 
 def main():

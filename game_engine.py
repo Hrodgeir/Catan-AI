@@ -12,6 +12,7 @@ class GameEngine:
         Represent the roll of two dice as two random picks between 1 and 6\n
         :return: The sum of two random numbers between 1 and 6
         """
+
         return random.randint(1, 6) + random.randint(1, 6)
 
     #TODO: actually test this method
@@ -36,6 +37,7 @@ class GameEngine:
         :param total_rounds: OPTIONAL, the number of rounds to play, default 2
         :return: The state of the board after setup rounds
         """
+
         round_counter = 0
         reverse = False
 
@@ -52,28 +54,41 @@ class GameEngine:
 
     def take_turn(self, players, current_board):
         """
+        Take a turn (Roll Dice, Get Resources, Make a Decision, Do Decision)
         """
+
         for player in players:
             current_board.current_roll = GameEngine.roll_dice()
+            print("Dice Roll: " + str(current_board.current_roll))
+            
             self.give_resources_by_dice_roll(current_board, players, current_board.current_roll)
-            decision, vertex = self.evaluate_decision(player, current_board)
-            current_board = self.do_decision(player, decision, current_board, vertex)
+
+            print("Current Resources: " + str(player.resources))
+            
+            decision, vertex, trade_g, trade_f = self.evaluate_decision(player, current_board)
+            print("Decision made: " + str(decision) + "\n")
+
+            current_board = self.do_decision(player, decision, current_board, vertex, trade_g, trade_f)
 
         return current_board
 
     def evaluate_decision(self, player, current_board):
         """
+        Evaluate all possible decisions based on weighted heuristics
         """
+
         decisions = ["do_nothing", "build_settlement", "build_city", "build_road", "draw_development", "trade"]
         decision = "do_nothing"
         vertex = None
+        trade_get = None # What to receive from a trade
+        trade_from = None # What to trade away
         highest_score = 0.5
         
         build_city_scores = self.calculate_city_scores(player, current_board)
         build_settlement_scores = self.calculate_settlement_scores(player, current_board)
         build_development_score = self.calculate_development_score(player, current_board)
-        trade_score = self.calculate_trade_score(player, current_board)
-        
+        trade_score, trade_g, trade_f = self.calculate_trade_score(player, current_board)
+
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
                 highest_score = score
@@ -88,35 +103,27 @@ class GameEngine:
         
         if build_development_score > highest_score:
             highest_score = build_development_score
-            vertex = None
             decision = "draw_development"
         
         if trade_score > highest_score:
             highest_score = trade_score
-            vertex = None
+            trade_get = trade_g
+            trade_from = trade_f
             decision = "trade"
         
-        return decision, vertex
+        return decision, vertex, trade_get, trade_from
 
-    def score_buyable(self, player, item):
-        if item == "build_settlement":
-            return self.score_settlement(player)
-        elif item == "build_city":
-            return self.score_city(player)
-        elif item == "build_road":
-            return self.score_road(player)
-        elif item == "draw_development":
-            return self.score_development_card(player)
-        else:
-            print("Something went wrong when trying to score buyable")
-            return 0
 
-    def do_decision(self, player, decision, current_board, vertex):
+    def do_decision(self, player, decision, current_board, vertex, trade_get, trade_from):
         """
+        Perform the decision
         """
 
         if decision == "trade":
-            pass
+            player.resources[trade_from] -= 4 
+            player.resources[trade_get] += 1
+            return current_board
+
         elif decision == "build_settlement":
             idx = vertex.name - 1
             distance = player.vertex_distances[idx]
@@ -125,15 +132,18 @@ class GameEngine:
             player.resources["wheat"] = player.resources["wheat"] - 1
             player.resources["sheep"] = player.resources["sheep"] - 1
             vertex.set_owner(player)
+
         elif decision == "build_city":
             pass
+
         elif decision == "build_road":
             pass
+
         elif decision == "draw_development":
-            current_board = self.draw_development_card(current_board)
+            current_board = self.draw_development_card(current_board, player)
             return current_board
 
-        else: #"do_nothing"
+        else: # "do_nothing"
            
             return current_board
     
@@ -172,13 +182,198 @@ class GameEngine:
         return scores
     
     def calculate_development_score(self, player, current_board):
-        return 0
+        """
+        Calculate the score for choosing a development card this turn
+        :param player: The player object who is deciding what to do
+        :param current_board: The current state of the board
+        :return: the score * the weight based on the player strategy
+        """
+        
+        score = 0
+        weight = 0
+        strategy = player.strategy
+        resources = player.resources
+
+        #  not enough resources
+        if resources["sheep"] == 0 or resources["stone"] == 0 or resources["wheat"] == 0:
+            return score
+
+        # enough resources, check strategy
+        if strategy == "development":
+            weight = 1
+        else:
+            weight = 0.65
+
+        # give score for not having enough knights for +2 points
+        if player.knights < 3:
+            score += 1
+
+        #TODO Adjust stuff
+        cards_pulled = 25 - len(current_board.development_deck)
+        deck_ratio = len(current_board.development_deck) / 25
+
+        score += deck_ratio
+
+        return weight*score
+
+    def draw_development_card(self, current_board, player):
+        """
+        Draws a development card.
+        """
+
+        # Ensure there's at least one card in the deck
+        if len(current_board.development_deck) < 1:
+            return
+
+        card = current_board.development_deck.pop(0)
+
+        if card == "knight":
+            player.knights = player.knights + 1
+            
+        elif card == "victory_point":
+            player.points = player.points + 1
+
+        return current_board
     
     def calculate_trade_score(self, player, current_board):
-        return 0
+        """
+        Calculate the score for choosing a development card this turn
+        :param player: The player object who is deciding what to do
+        :param current_board: The current state of the board
+        :return: the score * the weight based on the player strategy, trade_g: what the player gets, trade_f: what the player trades
+        """
 
-    def draw_development_card(current_board):
-        return current_board
+        score = 0
+        weight = 0
+        trade_g = None
+        trade_f = None
+
+        resources = player.resources
+        strategy = player.strategy
+        excess_resources, zero_resources = self.get_excess_and_zeros(resources)
+        lowest_resource = self.get_lowest_resource(resources)
+
+        if strategy == "settlements":
+            if "stone" in excess_resources:
+                trade_f = "stone"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "cities":
+            if "wheat" not in excess_resources and "stone" not in excess_resources:
+                random.shuffle(excess_resources)
+                trade_f = excess_resources.pop(0)
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "sheep_monopoly":
+            if "sheep" in excess_resources:
+                trade_f = "sheep"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+            
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "wheat_monopoly":
+            if "wheat" in excess_resources:
+                trade_f = "wheat"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "stone_monopoly":
+            if "stone" in excess_resources:
+                trade_f = "stone"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "brick_monopoly":
+            if "brick" in excess_resources:
+                trade_f = "brick"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "wood_monopoly":
+            if "wood" in excess_resources:
+                trade_f = "wood"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        elif strategy == "development":
+            if "brick" in excess_resources:
+                trade_f = "brick"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif "wood" in excess_resources:
+                trade_f = "wood"
+                weight = 1
+                score = score + 1
+                trade_g = lowest_resource
+
+            elif len(excess_resources) >= 1:
+                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+
+        else:
+            weight = 0
+
+        return score*weight, trade_g, trade_f
+
+    def get_excess_and_zeros(self, resources):
+        """
+        Get the resources that in excess of 4 or more and the resources at 0
+        :param resources: Dictionary of resources of the player
+        :return: List of resources in excess, and list of resources at zero
+        """
+        excess_resources = []
+        zero_resources = []
+        for key, value in resources.items():
+            if value >= 4:
+                excess_resources.append(key)
+
+            elif value == 0:
+                zero_resources.append(key)
+
+        return excess_resources, zero_resources
+
+    def get_lowest_resource(self, resources):
+        lowest_resource = min(resources, key=resources.get)
+        return lowest_resource
+
+    def random_excess_for_lowest(self, excess_resources, lowest_resource):
+        random.shuffle(excess_resources)
+        trade_f = excess_resources.pop(0)
+        weight = 0.75
+        score = 1
+        trade_g = lowest_resource
+
+        return weight, score, trade_g, trade_f
 
     def place_settlement(self, current_board, player):
         """
@@ -219,7 +414,7 @@ class GameEngine:
         best_score = 0
         vertex_id = next(iter(scores))
 
-        #find the best vertex for placement
+        # find the best vertex for placement
         for key, value in scores.items():
             if value > best_score:
                 best_score = value
@@ -234,6 +429,7 @@ class GameEngine:
         :param strategy: The strategy the player is using
         :return: The score the tile adds to the vertex
         """
+
         # weight_array: [stone, sheep, wood, brick, wheat]
 
         if strategy == "cities":
@@ -278,6 +474,24 @@ class GameEngine:
         else:
             return 0
 
+    def evaluate_win(self, players):
+        """
+        Evaluate if a player has won
+        :param players: The list of players playing
+        :return: Winner
+        """
         
-    
-        
+        winner = None
+        temp_points = 0
+
+        for player in players:
+            if player.knights >= 3:
+                temp_points = temp_points + 2
+            temp_points = temp_points + player.points
+
+            if temp_points >= 10:
+                winner = player
+                # Add points for having knights
+                player.points = player.points + 2
+
+        return winner
