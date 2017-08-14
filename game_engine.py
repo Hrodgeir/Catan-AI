@@ -90,7 +90,6 @@ class GameEngine:
         print("City: {}".format(max(build_city_scores)))
         print("Sett: {}".format(max(build_settlement_scores)))
         print("Deve: {}".format(build_development_score))
-        print("Trad: {}".format(trade_score))
 
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
@@ -107,7 +106,10 @@ class GameEngine:
         if build_development_score > highest_score:
             highest_score = build_development_score
             decision = "draw_development"
-        
+
+        trade_get = trade_g
+        trade_from = trade_f
+
         return decision, vertex, trade_get, trade_from
 
 
