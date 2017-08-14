@@ -215,16 +215,11 @@ class Display(tk.Frame):
         # Keep track of the oval index
         i = 0
         for oval in self.lst_ovals:
-            placement_owner = board.vertices[i].owner
-            if placement_owner != None:
-                if placement_owner.id == 1:
-                    colour = 'red'
-                elif placement_owner.id == 2:
-                    colour = 'blue'
-                elif placement_owner.id == 3:
-                    colour = 'green'
-                elif placement_owner.id == 4:
-                    colour = 'yellow'
+            vtx = board.vertices[i]
+            if vtx.owner != None:
+                colour = '#60B7FF'
+                if vtx.is_city:
+                    colour = '#005399'
             else:
                 colour = 'white'
             
@@ -334,7 +329,7 @@ class Display(tk.Frame):
         canvas.create_text(750, 570, text="Score", font=self.header)
 
         # Display the player information
-        canvas.create_rectangle(10, 590, 20, 600, fill='red')
+        canvas.create_rectangle(10, 590, 20, 600, fill='#60B7FF')
         canvas.create_text(60, 595, text="Player 1", font=self.default)
         canvas.create_text(175, 595, text=players[0].strategy, font=self.default)
 
