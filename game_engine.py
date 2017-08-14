@@ -318,9 +318,11 @@ class GameEngine:
         resources = player.resources
         strategy = player.strategy
         excess_resources, zero_resources = self.get_excess_and_zeros(resources)
-        lowest_resource = self.get_lowest_resource(resources)
 
         if strategy == "settlements":
+            required_resources = {"wheat": resources["wheat"], "wood": resources["wood"], "sheep": resources["sheep"], "brick": resources["brick"]}
+            lowest_resource = self.get_lowest_resource(required_resources)
+
             if "stone" in excess_resources:
                 trade_f = "stone"
                 weight = 1
@@ -330,6 +332,9 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "cities":
+            required_resources = {"wheat": resources["wheat"], "stone": resources["stone"]}
+            lowest_resource = self.get_lowest_resource(required_resources)
+
             if "wheat" not in excess_resources and "stone" not in excess_resources:
                 random.shuffle(excess_resources)
                 trade_f = excess_resources.pop(0)
@@ -340,6 +345,8 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "sheep_monopoly":
+            lowest_resource = self.get_lowest_resource(resources)
+
             if "sheep" in excess_resources:
                 trade_f = "sheep"
                 weight = 1
@@ -349,6 +356,8 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "wheat_monopoly":
+            lowest_resource = self.get_lowest_resource(resources)
+
             if "wheat" in excess_resources:
                 trade_f = "wheat"
                 weight = 1
@@ -358,6 +367,8 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "stone_monopoly":
+            lowest_resource = self.get_lowest_resource(resources)
+
             if "stone" in excess_resources:
                 trade_f = "stone"
                 weight = 1
@@ -367,6 +378,8 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "brick_monopoly":
+            lowest_resource = self.get_lowest_resource(resources)
+            
             if "brick" in excess_resources:
                 trade_f = "brick"
                 weight = 1
@@ -376,6 +389,8 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "wood_monopoly":
+            lowest_resource = self.get_lowest_resource(resources)
+
             if "wood" in excess_resources:
                 trade_f = "wood"
                 weight = 1
@@ -385,6 +400,9 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "development":
+            required_resources = {"wheat": resources["wheat"], "stone": resources["stone"], "stone": resources["sheep"]}
+            lowest_resource = self.get_lowest_resource(required_resources)
+
             if "brick" in excess_resources:
                 trade_f = "brick"
                 weight = 1
