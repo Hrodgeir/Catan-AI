@@ -42,7 +42,7 @@ def play_game(random, num_players=4):
         engine.setup_rounds(players, current_board)
         board_states.append(copy.deepcopy(current_board))
         
-        rounds = 50
+        rounds = 300
         has_won = False
 
         for i in range(rounds):

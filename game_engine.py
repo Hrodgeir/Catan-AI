@@ -80,7 +80,7 @@ class GameEngine:
         vertex = None
         trade_get = None # What to receive from a trade
         trade_from = None # What to trade away
-        highest_score = 0.3
+        highest_score = 0.1
         
         build_city_scores = self.calculate_city_scores(player, current_board)
         build_settlement_scores = self.calculate_settlement_scores(player, current_board)
@@ -90,6 +90,7 @@ class GameEngine:
         print("City: {}".format(max(build_city_scores)))
         print("Sett: {}".format(max(build_settlement_scores)))
         print("Deve: {}".format(build_development_score))
+        print("Trade: {}".format(trade_score))
 
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
@@ -107,22 +108,25 @@ class GameEngine:
             highest_score = build_development_score
             decision = "draw_development"
 
-        trade_get = trade_g
-        trade_from = trade_f
+        if trade_score > highest_score:
+            highest_score = trade_score
+            trade_get = trade_g
+            trade_from = trade_f
+            decision = "trade"
 
         return decision, vertex, trade_get, trade_from
-
 
     def do_decision(self, player, decision, current_board, vertex, trade_get, trade_from):
         """
         Perform the decision
         """
 
-        if trade_from != None and player.resources[trade_from] >= 4:
+        if decision == "trade":
             player.resources[trade_from] -= 4 
             player.resources[trade_get] += 1
+            return current_board
 
-        if decision == "build_settlement":
+        elif decision == "build_settlement":
             idx = vertex.name - 1
             distance = player.vertex_distances[idx]
             player.resources["wood"] = player.resources["wood"] - distance - 1
@@ -262,7 +266,7 @@ class GameEngine:
             score = GameEngine.translate(14 / player.knights, 0, 14/4, 0, 0.7)
         
         # Change score based on probability of victory points
-        num_cards_left = len(current_board.development_deck) - player.knights - player.victory_point_cards - player.blank_cards
+        num_cards_left = len(current_board.development_deck)
         if num_cards_left == 0:
             vp_probability = 0
         else:
@@ -303,7 +307,7 @@ class GameEngine:
         :return: the score * the weight based on the player strategy, trade_g: what the player gets, trade_f: what the player trades
         """
 
-        score = 0
+        score = 0.4
         weight = 0
         trade_g = None
         trade_f = None
@@ -317,7 +321,6 @@ class GameEngine:
             if "stone" in excess_resources:
                 trade_f = "stone"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -328,7 +331,6 @@ class GameEngine:
                 random.shuffle(excess_resources)
                 trade_f = excess_resources.pop(0)
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -338,7 +340,6 @@ class GameEngine:
             if "sheep" in excess_resources:
                 trade_f = "sheep"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
             
             elif len(excess_resources) >= 1:
@@ -348,7 +349,6 @@ class GameEngine:
             if "wheat" in excess_resources:
                 trade_f = "wheat"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -358,7 +358,6 @@ class GameEngine:
             if "stone" in excess_resources:
                 trade_f = "stone"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -368,7 +367,6 @@ class GameEngine:
             if "brick" in excess_resources:
                 trade_f = "brick"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -378,7 +376,6 @@ class GameEngine:
             if "wood" in excess_resources:
                 trade_f = "wood"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -388,13 +385,11 @@ class GameEngine:
             if "brick" in excess_resources:
                 trade_f = "brick"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif "wood" in excess_resources:
                 trade_f = "wood"
                 weight = 1
-                score = score + 1
                 trade_g = lowest_resource
 
             elif len(excess_resources) >= 1:
@@ -413,6 +408,7 @@ class GameEngine:
         """
         excess_resources = []
         zero_resources = []
+
         for key, value in resources.items():
             if value >= 4:
                 excess_resources.append(key)
@@ -429,7 +425,7 @@ class GameEngine:
     def random_excess_for_lowest(self, excess_resources, lowest_resource):
         random.shuffle(excess_resources)
         trade_f = excess_resources.pop(0)
-        weight = 0.75
+        weight = 0.2
         score = 1
         trade_g = lowest_resource
 
