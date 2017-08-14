@@ -147,6 +147,9 @@ class GameEngine:
 
         elif decision == "draw_development":
             current_board = self.draw_development_card(current_board, player)
+            player.resources["stone"] -= 1
+            player.resources["wheat"] -= 1
+            player.resources["sheep"] -= 1
             return current_board
 
         else: # "do_nothing"
