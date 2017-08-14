@@ -496,7 +496,7 @@ class GameEngine:
         Gets the probability weight of the specified tile.
         """
 
-        dice_value = tile.dice_value
+        dice_value = int(tile.dice_value)
 
         if dice_value == 0:
             return 0
@@ -542,6 +542,7 @@ class GameEngine:
         
         score = GameEngine.determine_score(tile_type, weight_array)
         probability = GameEngine.get_tile_probability_weight(tile)
+       
         return score * probability
 
     @staticmethod

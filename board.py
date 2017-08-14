@@ -20,7 +20,6 @@ class Board():
         if random:
             self.tiles = Tile.generate_layout()
             self.docks = Dock.generate_docks()
-
         else: 
             self.tiles = []
             self.docks = []
