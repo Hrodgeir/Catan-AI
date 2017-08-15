@@ -526,6 +526,8 @@ class GameEngine:
             return GameEngine.translate(4/36, 0, 5/36, 0, 1)
         elif dice_value == 6 or dice_value == 8:
             return GameEngine.translate(5/36, 0, 5/36, 0, 1)
+        else:
+            return 0
 
     @staticmethod
     def get_score(tile_type, strategy, tile):
