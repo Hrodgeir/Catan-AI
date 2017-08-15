@@ -8,7 +8,7 @@
 7,brick,false,10
 8,wheat,false,9
 9,wood,false,11
-10,desert,true,10
+10,desert,true,7
 11,wood,false,3
 12,stone,false,8
 13,wood,false,8
