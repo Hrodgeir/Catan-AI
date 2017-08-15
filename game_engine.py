@@ -15,7 +15,6 @@ class GameEngine:
 
         return random.randint(1, 6) + random.randint(1, 6)
 
-    #TODO: actually test this method
     def give_resources_by_dice_roll(self, board, players, dice_val):
         rewarded_tiles = board.tile_by_dice_val[str(dice_val)]
 
@@ -120,11 +119,15 @@ class GameEngine:
         """
         Perform the decision
         """
+        monopoly_strategies = ["sheep_monopoly", "wheat_monopoly", "stone_monopoly", "brick_monopoly", "wood_monopoly"]
 
         if decision == "trade":
-            player.resources[trade_from] -= 4 
-            player.resources[trade_get] += 1
-            return current_board
+            if player.strategy in monopoly_strategies: #assumption monopolies can trade 2 for 1
+                player.resources[trade_from] -= 2
+                player.resources[trade_get] += 1
+            else: # all others trade 4 to 1
+                player.resources[trade_from] -= 4 
+                player.resources[trade_get] += 1
 
         elif decision == "build_settlement":
             idx = vertex.name - 1
@@ -135,7 +138,6 @@ class GameEngine:
             player.resources["sheep"] = player.resources["sheep"] - 1
             vertex.set_owner(player)
             player.points += 1
-            return current_board
 
         elif decision == "build_city":
             idx = vertex.name - 1
@@ -143,17 +145,14 @@ class GameEngine:
             player.resources["stone"] -= 3
             vertex.is_city = True
             player.points += 1
-            return current_board
 
         elif decision == "draw_development":
             current_board = self.draw_development_card(current_board, player)
             player.resources["stone"] -= 1
             player.resources["wheat"] -= 1
             player.resources["sheep"] -= 1
-            return current_board
 
-        else: # "do_nothing"
-            return current_board
+        return current_board
     
     def calculate_city_scores(self, player, current_board):
         """
@@ -334,7 +333,6 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "cities":
-            #required_resources = resources
             lowest_resource = self.get_lowest_resource(resources)
 
             if len(excess_resources) > 0:
@@ -342,9 +340,6 @@ class GameEngine:
                 trade_f = excess_resources.pop(0)
                 weight = 1
                 trade_g = lowest_resource
-
-            #elif len(excess_resources) >= 1:
-                #weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "sheep_monopoly":
             lowest_resource = self.get_lowest_resource(resources)
