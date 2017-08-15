@@ -86,10 +86,10 @@ class GameEngine:
         build_development_score = self.calculate_development_score(player, current_board)
         trade_score, trade_g, trade_f = self.calculate_trade_score(player, current_board)
 
-        print("City: {}".format(max(build_city_scores)))
-        print("Sett: {}".format(max(build_settlement_scores)))
-        print("Deve: {}".format(build_development_score))
-        print("Trade: {}".format(trade_score))
+        #print("City: {}".format(max(build_city_scores)))
+        #print("Sett: {}".format(max(build_settlement_scores)))
+        #print("Deve: {}".format(build_development_score))
+        #print("Trade: {}".format(trade_score))
 
         for idx, score in enumerate(build_city_scores):
             if score > highest_score:
