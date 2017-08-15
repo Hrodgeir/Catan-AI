@@ -14,7 +14,7 @@ class Player:
         self.points = 2
         self.knights = 0
         self.victory_point_cards = 0
-        self.blank_cards = 0
+        self.num_settlements = 2
         self.decision = ""
 
     def set_strategy(self, new_strategy):

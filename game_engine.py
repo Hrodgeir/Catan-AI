@@ -138,6 +138,7 @@ class GameEngine:
             player.resources["sheep"] = player.resources["sheep"] - 1
             vertex.set_owner(player)
             player.points += 1
+            player.num_settlements += 1
 
         elif decision == "build_city":
             idx = vertex.name - 1
@@ -297,9 +298,6 @@ class GameEngine:
         elif card == "victory_point":
             player.victory_point_cards += 1
             player.points += 1
-        
-        elif card == "blank":
-            player.blank_cards += 1
 
         return current_board
     
