@@ -217,7 +217,7 @@ class GameEngine:
             costs = [distance + 1, distance + 1, 1, 1]
             after = [amounts[i] - costs[i] for i in range(len(amounts))]
             
-            # Skip is the vertex is already owned
+            # Skip if the vertex is already owned
             if vtx.owner is not None:
                 continue
             # Skip if the vertex has any direct neighbours
@@ -235,6 +235,10 @@ class GameEngine:
                 tile_type = tile.get_tile_type()
                 base_score = GameEngine.get_score(tile_type, player.strategy, tile)
                 scores[idx] += base_score # tile.probability
+            
+            # Remove score based on number of settlements already owned
+            if player.num_settlements > 3:
+                scores[idx] += (3 - player.num_settlements) * 0.05
             
         return scores
     
@@ -426,7 +430,7 @@ class GameEngine:
         zero_resources = []
 
         for key, value in resources.items():
-            if value >= 4:
+            if value >= 6:
                 excess_resources.append(key)
 
             elif value == 0:
