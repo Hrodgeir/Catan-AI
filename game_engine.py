@@ -261,6 +261,8 @@ class GameEngine:
 
         if player.strategy == "development":
             weight = 1
+        if player.strategy == "cities":
+            weight = 0
         
         # Change score based on current number of knights
         if player.knights <= 3:
@@ -332,17 +334,17 @@ class GameEngine:
                 weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "cities":
-            required_resources = {"wheat": resources["wheat"], "stone": resources["stone"]}
-            lowest_resource = self.get_lowest_resource(required_resources)
+            #required_resources = resources
+            lowest_resource = self.get_lowest_resource(resources)
 
-            if "wheat" not in excess_resources and "stone" not in excess_resources:
+            if len(excess_resources) > 0:
                 random.shuffle(excess_resources)
                 trade_f = excess_resources.pop(0)
                 weight = 1
                 trade_g = lowest_resource
 
-            elif len(excess_resources) >= 1:
-                weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
+            #elif len(excess_resources) >= 1:
+                #weight, score, trade_g, trade_f = self.random_excess_for_lowest(excess_resources, lowest_resource)
 
         elif strategy == "sheep_monopoly":
             lowest_resource = self.get_lowest_resource(resources)
