@@ -298,6 +298,10 @@ class GameEngine:
 
         if card == "knight":
             player.knights += 1
+
+            # Increase the score if they obtain 3 knights
+            if player.knights == 3:
+                player.points += 2
             
         elif card == "victory_point":
             player.victory_point_cards += 1
@@ -598,13 +602,7 @@ class GameEngine:
         temp_points = 0
 
         for player in players:
-            if player.knights >= 3:
-                temp_points = temp_points + 2
-            temp_points = temp_points + player.points
-
-            if temp_points >= 10:
+            if player.points >= 10:
                 winner = player
-                # Add points for having knights
-                player.points = player.points + 2
 
         return winner

@@ -120,7 +120,7 @@ class Display(tk.Frame):
         self.master.title("Catan AI Display")
 
         # Set size of window and central start location
-        w = 780
+        w = 855
         h = 680
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()
@@ -134,7 +134,7 @@ class Display(tk.Frame):
         """
 
         # Initialize canvas
-        canvas = tk.Canvas(self.master, width=800, height=680)
+        canvas = tk.Canvas(self.master, width=875, height=680)
         canvas.config(highlightthickness=0, borderwidth=0)
         canvas.place(x=0, y=0)
 
@@ -166,22 +166,22 @@ class Display(tk.Frame):
         # Create a button to go to the first board state
         self.btn_next_state = tk.Button(canvas, text="First Round", font=self.header,
                                         command=lambda : self.update(canvas, board_states, 0))
-        self.btn_next_state.place(x=75, y=500)
+        self.btn_next_state.place(x=113, y=500)
 
         # Create a button to go to the previous board state
         self.btn_previous_state = tk.Button(canvas, text="Previous Round", font=self.header,
                                             command=lambda : self.update(canvas, board_states, self.state-1))
-        self.btn_previous_state.place(x=225, y=500)
+        self.btn_previous_state.place(x=263, y=500)
 
         # Create a button to go to the next board state
         self.btn_next_state = tk.Button(canvas, text="Next Round", font=self.header,
                                         command=lambda : self.update(canvas, board_states, self.state+1))
-        self.btn_next_state.place(x=420, y=500)
+        self.btn_next_state.place(x=458, y=500)
 
         # Create a button to go to the last board state
         self.btn_next_state = tk.Button(canvas, text="Last Round", font=self.header,
                                         command=lambda : self.update(canvas, board_states, len(board_states)-1))
-        self.btn_next_state.place(x=575, y=500)
+        self.btn_next_state.place(x=613, y=500)
 
     def initialize_vertices(self, canvas, board):
         """
@@ -193,7 +193,7 @@ class Display(tk.Frame):
         # Keep track of the coordinate index
         i = 0
         for c in self.coords:
-            x = c.x * 40 + 200
+            x = c.x * 40 + 238
             y = c.y * 40 + 25
             
             # Create a new oval object and add it to the list
@@ -255,6 +255,9 @@ class Display(tk.Frame):
         # Update the knight count
         canvas.itemconfig(self.card_knights, text=('{}'.format(player.knights)))
 
+        # Update the victory point card count
+        canvas.itemconfig(self.card_vp, text=('{}'.format(player.victory_point_cards)))
+
         # Update the score value
         canvas.itemconfig(self.player_score, text=('{}'.format(player.points)))
 
@@ -267,12 +270,12 @@ class Display(tk.Frame):
         for v in board.vertices:
             coord = self.coords[i]
 
-            x = coord.x * 40 + 200
+            x = coord.x * 40 + 238
             y = coord.y * 40 + 25
 
             for n in v.neighbours:
                 nCoord = self.coords[n-1]
-                nx = nCoord.x * 40 + 200
+                nx = nCoord.x * 40 + 238
                 ny = nCoord.y * 40 + 25
                 canvas.create_line(x, y, nx, ny, width=2)
 
@@ -289,7 +292,7 @@ class Display(tk.Frame):
             dice_value = int(t.get_dice_value())
             coord = self.tile_coords[i]
 
-            x = coord.x * 40 + 240
+            x = coord.x * 40 + 278
             y = coord.y * 80 + 78
 
             canvas.create_text(x, y, text=tile_type.title(), font=self.header)
@@ -326,7 +329,8 @@ class Display(tk.Frame):
         canvas.create_text(525, 570, text="Stone", font=self.header)
         canvas.create_text(600, 570, text="Sheep", font=self.header)
         canvas.create_text(675, 570, text="Knights", font=self.header)
-        canvas.create_text(750, 570, text="Score", font=self.header)
+        canvas.create_text(750, 570, text="VP", font=self.header)
+        canvas.create_text(825, 570, text="Score", font=self.header)
 
         # Display the player information
         canvas.create_rectangle(10, 590, 20, 600, fill='#60B7FF')
@@ -340,6 +344,7 @@ class Display(tk.Frame):
         self.card_stone = canvas.create_text(525, 595, text="0", font=self.default)
         self.card_sheep = canvas.create_text(600, 595, text="0", font=self.default)
         self.card_knights = canvas.create_text(675, 595, text="0", font=self.default)
+        self.card_vp = canvas.create_text(750, 595, text="0", font=self.default)
 
         # Initialize the player score
-        self.player_score = canvas.create_text(750, 595, text="0", font=self.default)
+        self.player_score = canvas.create_text(825, 595, text="0", font=self.default)
