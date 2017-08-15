@@ -286,7 +286,7 @@ class Display(tk.Frame):
         i = 0
         for t in board.tiles:
             tile_type = t.get_tile_type()
-            dice_value = t.get_dice_value()
+            dice_value = int(t.get_dice_value())
             coord = self.tile_coords[i]
 
             x = coord.x * 40 + 240

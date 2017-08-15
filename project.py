@@ -42,18 +42,15 @@ def play_game(random, num_players=4):
         engine.setup_rounds(players, current_board)
         board_states.append(copy.deepcopy(current_board))
         
-        rounds = 50
+        rounds = 300
         has_won = False
 
         for i in range(rounds):
-            print("Turn: " + str(i+1))
             engine.take_turn(players, current_board)
             board_states.append(copy.deepcopy(current_board))
             winner = engine.evaluate_win(players)
             if winner != None:
                 break
-
-        #print(board.__repr__)
 
         # Initialize the display
         display = Display(board_states, players, winner)

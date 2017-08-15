@@ -1,5 +1,5 @@
 #id,tile_type,robber,dice_value
-1,stone,false,10
+1,sheep,false,10
 2,stone,false,2
 3,wood,false,9
 4,wheat,false,12
@@ -12,9 +12,9 @@
 11,wood,false,3
 12,stone,false,8
 13,wood,false,8
-14,stone,false,3
+14,sheep,false,3
 15,wheat,false,4
-16,stone,false,5
+16,sheep,false,5
 17,brick,false,5
 18,wheat,false,6
-19,stone,false,11
+19,sheep,false,11
